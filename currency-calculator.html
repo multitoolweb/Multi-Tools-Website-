@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Currency Converter</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --primary-blue: #007bff;
+      --hover-blue: #0056b3;
+      --bg-color: #f0f8ff;
+      --text-color: #333;
+      --border-color: #ddd;
+      --white: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    /* The Card */
+    .converter-card {
+      background: var(--white);
+      width: 100%;
+      max-width: 420px;
+      border-radius: 16px;
+      padding: 2.5rem 2rem;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+      text-align: center;
+    }
+
+    .card-header h2 {
+      color: var(--primary-blue);
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+    }
+
+    /* Form Styling */
+    .form-group {
+      text-align: left;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #666;
+      margin-bottom: 0.4rem;
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+    }
+
+    .amount-input {
+      width: 100%;
+      padding: 0.85rem;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 1.1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .amount-input:focus {
+      border-color: var(--primary-blue);
+    }
+
+    /* Custom Searchable Dropdown */
+    .dropdown-container {
+      position: relative;
+      width: 100%;
+    }
+
+    .dropdown-selected {
+      padding: 0.85rem;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      background: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: border-color 0.2s;
+    }
+
+    .dropdown-selected:hover {
+      border-color: #bbb;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 105%;
+      left: 0;
+      width: 100%;
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      z-index: 100;
+      display: none;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+
+    .dropdown-menu.show {
+      display: block;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-bottom: 1px solid #eee;
+      outline: none;
+      font-size: 0.95rem;
+      position: sticky;
+      top: 0;
+      background: white;
+    }
+
+    .dropdown-item {
+      padding: 12px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 0.95rem;
+      color: var(--text-color);
+    }
+
+    .dropdown-item:hover {
+      background-color: #f0f7ff;
+      color: var(--primary-blue);
+    }
+
+    /* Layout Row */
+    .currency-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+
+    .select-wrapper {
+      flex: 1;
+    }
+
+    .swap-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background-color: #f0f7ff;
+      border: 1px solid #d1e5ff;
+      color: var(--primary-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 2px;
+      flex-shrink: 0;
+    }
+
+    .swap-btn:hover {
+      background-color: var(--primary-blue);
+      color: white;
+      transform: rotate(180deg);
+    }
+
+    /* Convert Button */
+    .convert-btn {
+      width: 100%;
+      background-color: var(--primary-blue);
+      color: var(--white);
+      padding: 1rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 1.5rem;
+      transition: background-color 0.2s;
+    }
+
+    .convert-btn:hover {
+      background-color: var(--hover-blue);
+    }
+
+    /* Result Area */
+    .result-display {
+      padding: 1.5rem 1rem;
+      background: #fcfdff;
+      border-radius: 12px;
+      border: 1px solid #eef2f8;
+    }
+
+    .result-main {
+      font-weight: 700;
+      color: var(--text-color);
+      font-size: 1.5rem;
+    }
+
+    .rate-text {
+      font-size: 0.85rem;
+      color: #888;
+      margin-top: 10px;
+    }
+
+    /* Hide scrollbar for clean look */
+    .dropdown-menu::-webkit-scrollbar {
+      width: 6px;
+    }
+    .dropdown-menu::-webkit-scrollbar-thumb {
+      background: #ddd;
+      border-radius: 10px;
+    }
+
+    @media (max-width: 480px) {
+      .currency-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .swap-btn {
+        align-self: center;
+        transform: rotate(90deg);
+        margin: 0.5rem 0;
+      }
+      .swap-btn:hover {
+        transform: rotate(270deg);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="main-container">
+    <div class="converter-card">
+      <div class="card-header">
+        <h2>Currency Converter</h2>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Amount</label>
+        <input type="number" id="amount" class="amount-input" value="1" min="0">
+      </div>
+
+      <div class="currency-row">
+        <!-- From Dropdown -->
+        <div class="select-wrapper">
+          <label class="form-label">From</label>
+          <div class="dropdown-container" id="fromDropdown">
+            <div class="dropdown-selected" onclick="toggleDropdown('fromMenu')">
+              <span id="fromValue">USD</span>
+              <i class="fa-solid fa-chevron-down" style="font-size: 0.8rem; color: #999;"></i>
+            </div>
+            <div class="dropdown-menu" id="fromMenu">
+              <input type="text" class="search-box" placeholder="Search currency or country..." onkeyup="filterDropdown('fromMenu')">
+              <div class="options-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <button class="swap-btn" onclick="swapCurrencies()">
+          <i class="fa-solid fa-arrow-right-arrow-left"></i>
+        </button>
+
+        <!-- To Dropdown -->
+        <div class="select-wrapper">
+          <label class="form-label">To</label>
+          <div class="dropdown-container" id="toDropdown">
+            <div class="dropdown-selected" onclick="toggleDropdown('toMenu')">
+              <span id="toValue">INR</span>
+              <i class="fa-solid fa-chevron-down" style="font-size: 0.8rem; color: #999;"></i>
+            </div>
+            <div class="dropdown-menu" id="toMenu">
+              <input type="text" class="search-box" placeholder="Search currency or country..." onkeyup="filterDropdown('toMenu')">
+              <div class="options-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="convert-btn" id="convertBtn" onclick="getExchangeRate()">Convert</button>
+
+      <div class="result-display">
+        <div id="resultText" style="color: #666;">Enter an amount to see conversion</div>
+        <div id="rateText" class="rate-text"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const countryList = {
+      "AED": "UAE Dirham (United Arab Emirates)", "AFN": "Afghan Afghani (Afghanistan)", "ALL": "Albanian Lek (Albania)", "AMD": "Armenian Dram (Armenia)", "ANG": "Neth. Antillean Guilder (Curacao)", "AOA": "Angolan Kwanza (Angola)", "ARS": "Argentine Peso (Argentina)", "AUD": "Australian Dollar (Australia)", "AWG": "Aruban Florin (Aruba)", "AZN": "Azerbaijani Manat (Azerbaijan)", "BAM": "Bosnia Mark (Bosnia)", "BBD": "Barbadian Dollar (Barbados)", "BDT": "Bangladeshi Taka (Bangladesh)", "BGN": "Bulgarian Lev (Bulgaria)", "BHD": "Bahraini Dinar (Bahrain)", "BIF": "Burundian Franc (Burundi)", "BMD": "Bermudan Dollar (Bermuda)", "BND": "Brunei Dollar (Brunei)", "BOB": "Bolivian Boliviano (Bolivia)", "BRL": "Brazilian Real (Brazil)", "BSD": "Bahamian Dollar (Bahamas)", "BTC": "Bitcoin (Digital)", "BTN": "Bhutanese Ngultrum (Bhutan)", "BWP": "Botswanan Pula (Botswana)", "BYN": "Belarusian Ruble (Belarus)", "BZD": "Belize Dollar (Belize)", "CAD": "Canadian Dollar (Canada)", "CDF": "Congolese Franc (Congo)", "CHF": "Swiss Franc (Switzerland)", "CLP": "Chilean Peso (Chile)", "CNY": "Chinese Yuan (China)", "COP": "Colombian Peso (Colombia)", "CRC": "Costa Rican Colón (Costa Rica)", "CUP": "Cuban Peso (Cuba)", "CVE": "Cape Verdean Escudo (Cape Verde)", "CZK": "Czech Koruna (Czech Republic)", "DJF": "Djiboutian Franc (Djibouti)", "DKK": "Danish Krone (Denmark)", "DOP": "Dominican Peso (Dominican Republic)", "DZD": "Algerian Dinar (Algeria)", "EGP": "Egyptian Pound (Egypt)", "ETB": "Ethiopian Birr (Ethiopia)", "EUR": "Euro (European Union)", "FJD": "Fijian Dollar (Fiji)", "GBP": "British Pound (United Kingdom)", "GEL": "Georgian Lari (Georgia)", "GHS": "Ghanaian Cedi (Ghana)", "GIP": "Gibraltar Pound (Gibraltar)", "GMD": "Gambian Dalasi (Gambia)", "GNF": "Guinean Franc (Guinea)", "GTQ": "Guatemalan Quetzal (Guatemala)", "GYD": "Guyanaese Dollar (Guyana)", "HKD": "Hong Kong Dollar (Hong Kong)", "HNL": "Honduran Lempira (Honduras)", "HUF": "Hungarian Forint (Hungary)", "IDR": "Indonesian Rupiah (Indonesia)", "ILS": "Israeli Shekel (Israel)", "INR": "Indian Rupee (India)", "IQD": "Iraqi Dinar (Iraq)", "IRR": "Iranian Rial (Iran)", "ISK": "Icelandic Króna (Iceland)", "JMD": "Jamaican Dollar (Jamaica)", "JOD": "Jordanian Dinar (Jordan)", "JPY": "Japanese Yen (Japan)", "KES": "Kenyan Shilling (Kenya)", "KHR": "Cambodian Riel (Cambodia)", "KPW": "North Korean Won (North Korea)", "KRW": "South Korean Won (South Korea)", "KWD": "Kuwaiti Dinar (Kuwait)", "KZT": "Kazakhstani Tenge (Kazakhstan)", "LKR": "Sri Lankan Rupee (Sri Lanka)", "MAD": "Moroccan Dirham (Morocco)", "MDL": "Moldovan Leu (Moldova)", "MGA": "Malagasy Ariary (Madagascar)", "MMK": "Myanma Kyat (Myanmar)", "MNT": "Mongolian Tugrik (Mongolia)", "MUR": "Mauritian Rupee (Mauritius)", "MXN": "Mexican Peso (Mexico)", "MYR": "Malaysian Ringgit (Malaysia)", "NGN": "Nigerian Naira (Nigeria)", "NOK": "Norwegian Krone (Norway)", "NPR": "Nepalese Rupee (Nepal)", "NZD": "New Zealand Dollar (New Zealand)", "OMR": "Omani Rial (Oman)", "PHP": "Philippine Peso (Philippines)", "PKR": "Pakistani Rupee (Pakistan)", "PLN": "Polish Zloty (Poland)", "QAR": "Qatari Rial (Qatar)", "RON": "Romanian Leu (Romania)", "RUB": "Russian Ruble (Russia)", "SAR": "Saudi Riyal (Saudi Arabia)", "SEK": "Swedish Krone (Sweden)", "SGD": "Singapore Dollar (Singapore)", "THB": "Thai Baht (Thailand)", "TRY": "Turkish Lira (Turkey)", "TWD": "Taiwan Dollar (Taiwan)", "UAH": "Ukrainian Hryvnia (Ukraine)", "USD": "US Dollar (United States)", "VND": "Vietnamese Dong (Vietnam)", "ZAR": "South African Rand (South Africa)"
+    };
+
+    let selectedFrom = "USD";
+    let selectedTo = "INR";
+
+    function initDropdowns() {
+      const fromList = document.querySelector("#fromMenu .options-list");
+      const toList = document.querySelector("#toMenu .options-list");
+
+      Object.entries(countryList).forEach(([code, name]) => {
+        const item = `<div class="dropdown-item" onclick="selectCurrency('${code}', event)">${code} - ${name}</div>`;
+        fromList.insertAdjacentHTML("beforeend", item);
+        toList.insertAdjacentHTML("beforeend", item);
+      });
+    }
+
+    function toggleDropdown(menuId) {
+      const menu = document.getElementById(menuId);
+      const isVisible = menu.classList.contains('show');
+      document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+      if (!isVisible) {
+        menu.classList.add('show');
+        menu.querySelector('.search-box').focus();
+      }
+    }
+
+    function filterDropdown(menuId) {
+      const menu = document.getElementById(menuId);
+      const filter = menu.querySelector('.search-box').value.toLowerCase();
+      const items = menu.querySelectorAll('.dropdown-item');
+      items.forEach(item => {
+        const text = item.innerText.toLowerCase();
+        item.style.display = text.includes(filter) ? "block" : "none";
+      });
+    }
+
+    function selectCurrency(code, event) {
+      const menu = event.target.closest('.dropdown-menu');
+      if (menu.id === "fromMenu") {
+        selectedFrom = code;
+        document.getElementById("fromValue").innerText = code;
+      } else {
+        selectedTo = code;
+        document.getElementById("toValue").innerText = code;
+      }
+      menu.classList.remove('show');
+      menu.querySelector('.search-box').value = "";
+      filterDropdown(menu.id);
+    }
+
+    function swapCurrencies() {
+      const temp = selectedFrom;
+      selectedFrom = selectedTo;
+      selectedTo = temp;
+      document.getElementById("fromValue").innerText = selectedFrom;
+      document.getElementById("toValue").innerText = selectedTo;
+      getExchangeRate();
+    }
+
+    async function getExchangeRate() {
+      const amountInput = document.getElementById("amount");
+      const resultDiv = document.getElementById("resultText");
+      const rateDiv = document.getElementById("rateText");
+      const btn = document.getElementById("convertBtn");
+
+      let val = parseFloat(amountInput.value) || 1;
+      btn.innerText = "Processing...";
+      btn.disabled = true;
+
+      try {
+        const response = await fetch(`https://api.exchangerate-api.com/v4/latest/${selectedFrom}`);
+        const data = await response.json();
+        const rate = data.rates[selectedTo];
+        const total = (val * rate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        resultDiv.innerHTML = `<span class="result-main">${val} ${selectedFrom} = ${total} ${selectedTo}</span>`;
+        rateDiv.innerText = `1 ${selectedFrom} = ${rate.toFixed(4)} ${selectedTo} • Last updated today`;
+      } catch (err) {
+        resultDiv.innerText = "Error updating rates.";
+      } finally {
+        btn.innerText = "Convert";
+        btn.disabled = false;
+      }
+    }
+
+    window.onclick = function(event) {
+      if (!event.target.closest('.dropdown-container')) {
+        document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+      }
+    }
+
+    initDropdowns();
+  </script>
+</body>
+</html>
