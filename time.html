@@ -1,0 +1,261 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Free Time Zone Converter Online | Convert Time Between Time Zones</title>
+
+<meta name="description" content="Free online time zone converter tool. Instantly convert time between global time zones like UTC, IST, EST, PST, GMT, and Nepal Time. Fast, accurate & mobile-friendly.">
+
+<meta name="keywords" content="time zone converter, convert time zones, world clock, time zone calculator, UTC to IST, EST to GMT, Nepal time converter">
+
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://yourwebsite.com/time-zone-converter">
+
+<style>
+:root {
+    --blue: #1e90ff;
+    --light-blue: #eaf4ff;
+    --white: #ffffff;
+    --dark: #333333;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    margin: 0;
+    background: var(--light-blue);
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.page-wrapper {
+    width: 100%;
+    max-width: 520px;
+}
+
+.tool-container {
+    background: var(--white);
+    padding: 22px;
+    border-radius: 14px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+}
+
+h1 {
+    text-align: center;
+    color: var(--blue);
+    margin-bottom: 20px;
+    font-size: 1.7rem;
+}
+
+.field {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+    color: var(--dark);
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.convert-btn {
+    background: var(--blue);
+    color: var(--white);
+}
+
+.reset-btn {
+    background: #f1f1f1;
+    color: var(--dark);
+}
+
+.result {
+    margin-top: 18px;
+    padding: 15px;
+    background: var(--light-blue);
+    border-radius: 8px;
+    text-align: center;
+    font-size: 1.05rem;
+}
+
+.seo-content {
+    margin-top: 30px;
+    background: var(--white);
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.seo-content h2,
+.seo-content h3 {
+    color: var(--blue);
+}
+
+.seo-content ul {
+    padding-left: 18px;
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.4rem;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="page-wrapper">
+
+<div class="tool-container">
+    <h1>Time Zone Converter</h1>
+
+    <div class="field">
+        <label for="fromTime">Select Date & Time</label>
+        <input type="datetime-local" id="fromTime">
+    </div>
+
+    <div class="field">
+        <label for="fromZone">From Time Zone</label>
+        <select id="fromZone"></select>
+    </div>
+
+    <div class="field">
+        <label for="toZone">To Time Zone</label>
+        <select id="toZone"></select>
+    </div>
+
+    <div class="buttons">
+        <button class="convert-btn" onclick="convertTime()">Convert</button>
+        <button class="reset-btn" onclick="resetTool()">Clear</button>
+    </div>
+
+    <div class="result" id="result">
+        Converted time will appear here
+    </div>
+</div>
+
+<!-- SEO CONTENT -->
+<section class="seo-content">
+    <h2>Online Time Zone Converter Tool</h2>
+    <p>
+        This free time zone converter allows you to quickly convert time between
+        different global time zones. It is ideal for international meetings,
+        travel planning, remote work, and scheduling across countries.
+    </p>
+
+    <h3>Popular Time Zone Conversions</h3>
+    <ul>
+        <li>UTC to IST (India Standard Time)</li>
+        <li>UTC to Nepal Time (NPT)</li>
+        <li>EST to GMT</li>
+        <li>PST to IST</li>
+        <li>London to New York Time</li>
+    </ul>
+
+    <p>
+        Our time zone calculator supports major regions including Asia, Europe,
+        America, and Australia. It is mobile-friendly, fast, accurate, and
+        completely free to use.
+    </p>
+</section>
+
+</div>
+
+<script>
+const timeZones = [
+    "UTC",
+    "Asia/Kathmandu",
+    "Asia/Kolkata",
+    "Asia/Dubai",
+    "Asia/Tokyo",
+    "Europe/London",
+    "Europe/Berlin",
+    "America/New_York",
+    "America/Chicago",
+    "America/Los_Angeles",
+    "Australia/Sydney"
+];
+
+const fromZone = document.getElementById("fromZone");
+const toZone = document.getElementById("toZone");
+
+timeZones.forEach(zone => {
+    fromZone.add(new Option(zone, zone));
+    toZone.add(new Option(zone, zone));
+});
+
+fromZone.value = "UTC";
+toZone.value = "Asia/Kathmandu";
+
+function convertTime() {
+    const input = document.getElementById("fromTime").value;
+    if (!input) {
+        document.getElementById("result").innerText = "Please select a time.";
+        return;
+    }
+
+    const date = new Date(input);
+
+    const fromText = new Intl.DateTimeFormat("en-US", {
+        timeZone: fromZone.value,
+        dateStyle: "medium",
+        timeStyle: "short"
+    }).format(date);
+
+    const toText = new Intl.DateTimeFormat("en-US", {
+        timeZone: toZone.value,
+        dateStyle: "medium",
+        timeStyle: "short"
+    }).format(date);
+
+    document.getElementById("result").innerHTML =
+        `<strong>${fromText}</strong> (${fromZone.value})<br>→<br>
+         <strong>${toText}</strong> (${toZone.value})`;
+}
+
+function resetTool() {
+    document.getElementById("fromTime").value = "";
+    document.getElementById("result").innerText = "Converted time will appear here";
+    fromZone.value = "UTC";
+    toZone.value = "Asia/Kathmandu";
+}
+
+document.querySelectorAll("select, input").forEach(el => {
+    el.addEventListener("change", convertTime);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,388 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pro Image Resizer</title>
+  <style>
+    :root {
+      --main-blue: #007bff;
+      --hover-blue: #0056b3;
+      --bg-blue: #e6f0ff;
+      --text-dark: #003366;
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background-color: var(--bg-blue);
+      color: var(--text-dark);
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      max-width: 700px;
+      width: 100%;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 51, 102, 0.15);
+      padding: 2rem;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--main-blue);
+      margin-top: 0;
+    }
+
+    /* Upload Area */
+    .upload-zone {
+      border: 2px dashed var(--main-blue);
+      padding: 30px;
+      text-align: center;
+      border-radius: 10px;
+      background: #fdfdff;
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: background 0.2s;
+    }
+
+    .upload-zone:hover {
+      background: #f0f7ff;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    /* Editor Layout */
+    .editor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .control-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: var(--main-blue);
+    }
+
+    input[type="number"], select {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+
+    /* Aspect Ratio Toggle */
+    .aspect-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--main-blue);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    /* Transform Buttons */
+    .transform-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .btn-small {
+      flex: 1;
+      padding: 8px;
+      background: #f0f7ff;
+      border: 1px solid var(--main-blue);
+      color: var(--main-blue);
+      border-radius: 4px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    /* Preset Chips */
+    .presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 5px;
+    }
+
+    .chip {
+      background: #eee;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+
+    .chip:hover {
+      border-color: var(--main-blue);
+      color: var(--main-blue);
+    }
+
+    /* Canvas & Preview */
+    .preview-panel {
+      text-align: center;
+    }
+
+    canvas {
+      max-width: 100%;
+      height: auto;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-image: linear-gradient(45deg, #eee 25%, transparent 25%), 
+                        linear-gradient(-45deg, #eee 25%, transparent 25%), 
+                        linear-gradient(45deg, transparent 75%, #eee 75%), 
+                        linear-gradient(-45deg, transparent 75%, #eee 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    }
+
+    .main-btn {
+      background-color: var(--main-blue);
+      color: white;
+      padding: 1rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 20px;
+      transition: background 0.2s;
+    }
+
+    .main-btn:hover {
+      background-color: var(--hover-blue);
+    }
+
+    .download-link {
+      display: none;
+      text-align: center;
+      margin-top: 15px;
+      color: var(--main-blue);
+      font-weight: bold;
+      text-decoration: none;
+      padding: 10px;
+      border: 2px solid var(--main-blue);
+      border-radius: 8px;
+    }
+
+    @media (max-width: 600px) {
+      .editor-grid {
+        grid-template-columns: 1fr;
+      }
+      .container {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Pro Image Resizer</h1>
+
+    <div class="upload-zone" onclick="document.getElementById('upload').click()">
+      <p>Click or drag image here to start</p>
+      <input type="file" id="upload" accept="image/*" />
+    </div>
+
+    <div id="editorUI" style="display:none;">
+      <div class="editor-grid">
+        <!-- Controls -->
+        <div class="control-panel">
+          <div class="input-group">
+            <label>Width (px)</label>
+            <input type="number" id="width" placeholder="Width" />
+          </div>
+
+          <div class="input-group">
+            <label>Height (px)</label>
+            <input type="number" id="height" placeholder="Height" />
+          </div>
+
+          <div class="aspect-toggle">
+            <input type="checkbox" id="lockAspect" checked />
+            <label for="lockAspect" style="color:var(--text-dark)">Lock Aspect Ratio</label>
+          </div>
+
+          <div class="input-group">
+            <label>Presets</label>
+            <div class="presets">
+              <div class="chip" onclick="setPreset(1080, 1080)">Square (1:1)</div>
+              <div class="chip" onclick="setPreset(1920, 1080)">Full HD</div>
+              <div class="chip" onclick="setPreset(1080, 1920)">Story (9:16)</div>
+              <div class="chip" onclick="setPreset(1200, 630)">FB Post</div>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>Orientation</label>
+            <div class="transform-row">
+              <button class="btn-small" onclick="rotateImage()">Rotate 90°</button>
+              <button class="btn-small" onclick="flipImage('h')">Flip H</button>
+              <button class="btn-small" onclick="flipImage('v')">Flip V</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preview -->
+        <div class="preview-panel">
+          <label>Preview</label>
+          <canvas id="canvas"></canvas>
+          <div id="info" style="font-size: 0.7rem; margin-top: 5px;"></div>
+        </div>
+      </div>
+
+      <button class="main-btn" onclick="processImage()">Process & Download</button>
+      <a id="downloadLink" class="download-link" download="resized-image.png">Download Now</a>
+    </div>
+  </div>
+
+  <script>
+    let originalImage = new Image();
+    let rotation = 0;
+    let flipH = 1;
+    let flipV = 1;
+    let ratio = 1;
+
+    const widthInput = document.getElementById('width');
+    const heightInput = document.getElementById('height');
+    const lockAspect = document.getElementById('lockAspect');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    document.getElementById('upload').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        originalImage.onload = function() {
+          ratio = originalImage.width / originalImage.height;
+          widthInput.value = originalImage.width;
+          heightInput.value = originalImage.height;
+          rotation = 0;
+          flipH = 1;
+          flipV = 1;
+          document.getElementById('editorUI').style.display = 'block';
+          updatePreview();
+        };
+        originalImage.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Aspect ratio logic
+    widthInput.addEventListener('input', () => {
+      if (lockAspect.checked) {
+        heightInput.value = Math.round(widthInput.value / ratio);
+      }
+      updatePreview();
+    });
+
+    heightInput.addEventListener('input', () => {
+      if (lockAspect.checked) {
+        widthInput.value = Math.round(heightInput.value * ratio);
+      }
+      updatePreview();
+    });
+
+    function setPreset(w, h) {
+      widthInput.value = w;
+      heightInput.value = h;
+      if (lockAspect.checked) ratio = w / h;
+      updatePreview();
+    }
+
+    function rotateImage() {
+      rotation = (rotation + 90) % 360;
+      updatePreview();
+    }
+
+    function flipImage(dir) {
+      if (dir === 'h') flipH *= -1;
+      if (dir === 'v') flipV *= -1;
+      updatePreview();
+    }
+
+    function updatePreview() {
+      const w = parseInt(widthInput.value) || 100;
+      const h = parseInt(heightInput.value) || 100;
+      
+      // For preview, we limit the canvas size but keep proportions
+      const displayMax = 300;
+      const displayScale = Math.min(displayMax / w, displayMax / h, 1);
+      
+      canvas.width = w * displayScale;
+      canvas.height = h * displayScale;
+
+      draw(canvas, ctx, w * displayScale, h * displayScale);
+      document.getElementById('info').innerText = `Target: ${w} x ${h}px`;
+    }
+
+    function draw(targetCanvas, targetCtx, w, h) {
+      targetCtx.clearRect(0, 0, w, h);
+      targetCtx.save();
+      
+      targetCtx.translate(w / 2, h / 2);
+      targetCtx.rotate((rotation * Math.PI) / 180);
+      targetCtx.scale(flipH, flipV);
+      
+      // Adjust draw dimensions if rotated sideways
+      if (rotation === 90 || rotation === 270) {
+        targetCtx.drawImage(originalImage, -h / 2, -w / 2, h, w);
+      } else {
+        targetCtx.drawImage(originalImage, -w / 2, -h / 2, w, h);
+      }
+      
+      targetCtx.restore();
+    }
+
+    function processImage() {
+      const finalWidth = parseInt(widthInput.value);
+      const finalHeight = parseInt(heightInput.value);
+      
+      const offscreenCanvas = document.createElement('canvas');
+      const offCtx = offscreenCanvas.getContext('2d');
+      
+      offscreenCanvas.width = finalWidth;
+      offscreenCanvas.height = finalHeight;
+
+      draw(offscreenCanvas, offCtx, finalWidth, finalHeight);
+
+      const downloadLink = document.getElementById('downloadLink');
+      downloadLink.href = offscreenCanvas.toDataURL('image/png');
+      downloadLink.style.display = 'block';
+      // Automatically trigger click for smoother experience
+      downloadLink.click();
+    }
+  </script>
+ <script async="async" data-cfasync="false" src="https://pl28699215.effectivegatecpm.com/6638ee3f7ef875c60276d1e326e6d7e3/invoke.js"></script>
+<div id="container-6638ee3f7ef875c60276d1e326e6d7e3"></div>
+</body>
+</html>
+

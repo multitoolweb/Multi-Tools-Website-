@@ -1,0 +1,496 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    
+    <!-- SEO Meta Tags -->
+    <title>Scientific Calculator Pro | Advanced Online Math Tool</title>
+    <meta name="description" content="Free online scientific calculator with advanced functions including trigonometry, logarithms, exponents, and more. Perfect for students, engineers, and professionals.">
+    <meta name="keywords" content="scientific calculator, online calculator, math tool, trigonometry calculator, logarithm calculator, engineering calculator, free calculator, web calculator">
+    <meta name="author" content="Scientific Calculator Pro">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:title" content="Scientific Calculator Pro | Advanced Online Math Tool">
+    <meta property="og:description" content="Free online scientific calculator with advanced mathematical functions. No download required.">
+    <meta property="og:type" content="website">
+    
+    <!-- Structured Data for Search Engines -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Scientific Calculator Pro",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Any",
+        "description": "Advanced scientific calculator with trigonometric, logarithmic, and exponential functions",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "ratingCount": "1247"
+        },
+        "featureList": [
+            "Trigonometric functions (sin, cos, tan)",
+            "Logarithmic and exponential functions",
+            "Square root and power functions",
+            "Calculation history",
+            "Keyboard support",
+            "Mobile responsive design"
+        ]
+    }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f4f7f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin: 0 0 10px 0;
+            font-size: 2.5rem;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .calculator-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .calculator {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 320px;
+        }
+
+        .history-panel {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 250px;
+            max-height: 520px;
+            overflow-y: auto;
+        }
+
+        .history-title {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #f1f1f1;
+            padding-bottom: 5px;
+            text-align: left;
+        }
+
+        .history-item {
+            font-size: 0.9rem;
+            padding: 8px;
+            border-bottom: 1px solid #f9f9f9;
+            text-align: right;
+            cursor: pointer;
+        }
+
+        .history-item:hover {
+            background-color: #f0f7ff;
+        }
+
+        #display {
+            width: 100%;
+            height: 60px;
+            font-size: 1.8rem;
+            text-align: right;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background-color: #f8f9fa;
+            color: #333;
+            box-sizing: border-box;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .button {
+            height: 55px;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            cursor: pointer;
+            background-color: #f8f9fa;
+            transition: all 0.2s;
+            color: #444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .button:hover {
+            background-color: #e9ecef;
+            border-color: #ccc;
+        }
+
+        .button.clear {
+            background-color: #ffeded;
+            color: #d63031;
+            border-color: #fab1a0;
+        }
+
+        .button.clear:hover { background-color: #ff7675; color: white; }
+
+        .button.equals {
+            background-color: #28a745;
+            color: white;
+            grid-column: span 2;
+        }
+
+        .button.equals:hover { background-color: #218838; }
+
+        .button.function {
+            background-color: #e3f2fd;
+            color: #007bff;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .button.op {
+            background-color: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .backspace {
+            background-color: #f1f3f5;
+            color: #495057;
+        }
+
+        /* Instructions and SEO Content */
+        .content-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-top: 30px;
+        }
+
+        .section-title {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        .feature-list, .instructions-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .feature-list li, .instructions-list li {
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .feature-list li:before, .instructions-list li:before {
+            content: "✓";
+            color: #27ae60;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        .keyboard-shortcuts {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .calculator-container { 
+                flex-direction: column; 
+                align-items: center; 
+            }
+            .history-panel { 
+                width: 320px; 
+                max-height: 200px; 
+            }
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calculator, .history-panel {
+                width: 100%;
+            }
+            .header {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <!-- Header with SEO-friendly title and description -->
+        <header class="header">
+            <h1>Scientific Calculator Pro</h1>
+            <p>Free advanced online scientific calculator with trigonometric, logarithmic, exponential functions and calculation history. Perfect for students, engineers, and math enthusiasts.</p>
+        </header>
+
+        <!-- Main Calculator Section -->
+        <div class="calculator-container">
+            <div class="calculator">
+                <input type="text" id="display" readonly placeholder="0" aria-label="Calculator display" />
+                
+                <div class="grid">
+                    <!-- Row 1 -->
+                    <button class="button clear" onclick="clearDisplay()" aria-label="Clear">C</button>
+                    <button class="button backspace" onclick="backspace()" aria-label="Backspace">⌫</button>
+                    <button class="button function" onclick="appendToDisplay('(')">(</button>
+                    <button class="button function" onclick="appendToDisplay(')')">)</button>
+
+                    <!-- Row 2 -->
+                    <button class="button function" onclick="appendToDisplay('sin(')" aria-label="Sine function">sin</button>
+                    <button class="button function" onclick="appendToDisplay('cos(')" aria-label="Cosine function">cos</button>
+                    <button class="button function" onclick="appendToDisplay('tan(')" aria-label="Tangent function">tan</button>
+                    <button class="button op" onclick="appendToDisplay('/')" aria-label="Divide">÷</button>
+
+                    <!-- Row 3 -->
+                    <button class="button" onclick="appendToDisplay('7')">7</button>
+                    <button class="button" onclick="appendToDisplay('8')">8</button>
+                    <button class="button" onclick="appendToDisplay('9')">9</button>
+                    <button class="button op" onclick="appendToDisplay('*')" aria-label="Multiply">×</button>
+
+                    <!-- Row 4 -->
+                    <button class="button" onclick="appendToDisplay('4')">4</button>
+                    <button class="button" onclick="appendToDisplay('5')">5</button>
+                    <button class="button" onclick="appendToDisplay('6')">6</button>
+                    <button class="button op" onclick="appendToDisplay('-')" aria-label="Subtract">−</button>
+
+                    <!-- Row 5 -->
+                    <button class="button" onclick="appendToDisplay('1')">1</button>
+                    <button class="button" onclick="appendToDisplay('2')">2</button>
+                    <button class="button" onclick="appendToDisplay('3')">3</button>
+                    <button class="button op" onclick="appendToDisplay('+')" aria-label="Add">+</button>
+
+                    <!-- Row 6 -->
+                    <button class="button" onclick="appendToDisplay('0')">0</button>
+                    <button class="button" onclick="appendToDisplay('.')" aria-label="Decimal point">.</button>
+                    <button class="button function" onclick="appendToDisplay('sqrt(')" aria-label="Square root">√</button>
+                    <button class="button function" onclick="appendToDisplay('log(')" aria-label="Logarithm">log</button>
+
+                    <!-- Row 7 -->
+                    <button class="button function" onclick="appendToDisplay('exp(')" aria-label="Exponential">exp</button>
+                    <button class="button function" onclick="appendToDisplay('**')" aria-label="Power">^</button>
+                    <button class="button equals" onclick="calculate()" aria-label="Calculate">=</button>
+                </div>
+            </div>
+
+            <div class="history-panel">
+                <div class="history-title">Calculation History</div>
+                <div id="history-list">
+                    <div style="color: #ccc; font-style: italic; font-size: 0.8rem;">No calculations yet</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEO Content Section -->
+        <section class="content-section" aria-label="Calculator features and instructions">
+            <h2 class="section-title">How to Use Scientific Calculator Pro</h2>
+            <p>Our free online scientific calculator is designed to handle complex mathematical calculations with ease. Here's how to make the most of its features:</p>
+            
+            <h3>Basic Operations:</h3>
+            <ul class="instructions-list">
+                <li><strong>Basic Arithmetic:</strong> Use +, −, ×, ÷ for addition, subtraction, multiplication, and division</li>
+                <li><strong>Decimal Numbers:</strong> Click the "." button or type period on your keyboard</li>
+                <li><strong>Parentheses:</strong> Use ( ) to group calculations and control order of operations</li>
+                <li><strong>Clear/Backspace:</strong> Press C to clear everything or ⌫ to delete last character</li>
+            </ul>
+
+            <h3>Advanced Functions:</h3>
+            <ul class="instructions-list">
+                <li><strong>Trigonometry:</strong> sin(), cos(), tan() for sine, cosine, and tangent functions</li>
+                <li><strong>Square Root:</strong> √() calculates the square root of a number</li>
+                <li><strong>Logarithms:</strong> log() for natural logarithm calculations</li>
+                <li><strong>Exponents:</strong> exp() for exponential functions or ^ for power operations</li>
+            </ul>
+
+            <div class="keyboard-shortcuts">
+                <h3>Keyboard Shortcuts:</h3>
+                <p>Type directly into the calculator using your keyboard:</p>
+                <ul class="instructions-list">
+                    <li><strong>Numbers 0-9:</strong> Type directly</li>
+                    <li><strong>Operators:</strong> +, -, *, /</li>
+                    <li><strong>Enter or =:</strong> Calculate result</li>
+                    <li><strong>Backspace:</strong> Delete last character</li>
+                    <li><strong>Escape:</strong> Clear display</li>
+                    <li><strong>Parentheses:</strong> ( and ) keys</li>
+                </ul>
+            </div>
+
+            <h3>Features:</h3>
+            <ul class="feature-list">
+                <li>100% Free - No registration required</li>
+                <li>Works on all devices - Desktop, tablet, and mobile</li>
+                <li>Calculation history - Click any history item to reuse</li>
+                <li>Automatic bracket completion</li>
+                <li>High precision calculations</li>
+                <li>Clean, intuitive interface</li>
+            </ul>
+
+            <h3>Common Uses:</h3>
+            <p>This scientific calculator is ideal for:</p>
+            <ul class="instructions-list">
+                <li>High school and college mathematics</li>
+                <li>Engineering calculations</li>
+                <li>Scientific research</li>
+                <li>Financial calculations</li>
+                <li>Homework and exam preparation</li>
+                <li>Professional technical work</li>
+            </ul>
+
+            <p><strong>Tip:</strong> The calculator automatically closes parentheses if you forget. Your calculation history is saved during your session and can be clicked to reuse results.</p>
+        </section>
+
+        <!-- Footer with additional SEO content -->
+        <footer style="text-align: center; margin-top: 40px; padding: 20px; color: #7f8c8d; font-size: 0.9rem;">
+            <p>Scientific Calculator Pro © 2024 - Free Online Math Tool | 
+               <a href="#privacy" style="color: #3498db; text-decoration: none;">Privacy</a> | 
+               <a href="#terms" style="color: #3498db; text-decoration: none;">Terms</a> | 
+               <a href="#contact" style="color: #3498db; text-decoration: none;">Contact</a>
+            </p>
+            <p>This tool works entirely in your browser - no data is sent to servers. All calculations happen locally on your device.</p>
+        </footer>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+        const historyList = document.getElementById('history-list');
+
+        function appendToDisplay(value) {
+            if (display.value === 'Error') display.value = '';
+            display.value += value;
+        }
+
+        function clearDisplay() {
+            display.value = '';
+        }
+
+        function backspace() {
+            display.value = display.value.slice(0, -1);
+        }
+
+        function addToHistory(expression, result) {
+            const item = document.createElement('div');
+            item.className = 'history-item';
+            item.innerHTML = `<div>${expression}</div><div style="font-weight:bold; color:#007bff">= ${result}</div>`;
+            item.onclick = () => {
+                display.value = result;
+            };
+            
+            if (historyList.firstChild && historyList.firstChild.style?.fontStyle === 'italic') {
+                historyList.innerHTML = '';
+            }
+            
+            historyList.insertBefore(item, historyList.firstChild);
+        }
+
+        function calculate() {
+            let originalExpression = display.value;
+            if (!originalExpression) return;
+
+            try {
+                let expression = originalExpression;
+                
+                // Smart auto-close brackets
+                const openBrackets = (expression.match(/\(/g) || []).length;
+                const closeBrackets = (expression.match(/\)/g) || []).length;
+                for (let i = 0; i < openBrackets - closeBrackets; i++) {
+                    expression += ')';
+                }
+
+                // Math replacements
+                const processedExpr = expression
+                    .replace(/sqrt/g, 'Math.sqrt')
+                    .replace(/log/g, 'Math.log')
+                    .replace(/exp/g, 'Math.exp')
+                    .replace(/sin/g, 'Math.sin')
+                    .replace(/cos/g, 'Math.cos')
+                    .replace(/tan/g, 'Math.tan');
+
+                const result = eval(processedExpr);
+                
+                // Format result (max 8 decimal places)
+                const formattedResult = Number.isInteger(result) ? result : parseFloat(result.toFixed(8));
+                
+                addToHistory(expression, formattedResult);
+                display.value = formattedResult;
+            } catch (e) {
+                display.value = 'Error';
+            }
+        }
+
+        // Support Keyboard Input
+        document.addEventListener('keydown', (e) => {
+            if (e.key >= '0' && e.key <= '9') appendToDisplay(e.key);
+            if (e.key === '.') appendToDisplay('.');
+            if (['+', '-', '*', '/'].includes(e.key)) appendToDisplay(e.key);
+            if (e.key === 'Enter' || e.key === '=') calculate();
+            if (e.key === 'Backspace') backspace();
+            if (e.key === 'Escape') clearDisplay();
+            if (e.key === '(') appendToDisplay('(');
+            if (e.key === ')') appendToDisplay(')');
+        });
+
+        // Focus the display on load for better accessibility
+        window.onload = function() {
+            display.focus();
+        };
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,153 @@
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>System Maintenance - Utila</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #007bff;
+      --bg: #f2f9ff;
+      --text: #1e293b;
+      --text-light: #64748b;
+      --card-bg: #ffffff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .maintenance-container {
+      text-align: center;
+      background: var(--card-bg);
+      padding: 3.5rem 2rem;
+      border-radius: 24px;
+      box-shadow: 0 20px 50px rgba(0, 123, 255, 0.1);
+      max-width: 450px;
+      width: 90%;
+      border: 1px solid rgba(0, 123, 255, 0.1);
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .icon-wrapper {
+      width: 80px;
+      height: 80px;
+      background: #eef7ff;
+      color: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2.5rem;
+      margin: 0 auto 1.5rem;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    p {
+      color: var(--text-light);
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #f8fafc;
+      padding: 8px 16px;
+      border-radius: 30px;
+      border: 1px solid #e2e8f0;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-light);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      background: #fbbf24;
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.5; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .btn-home {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      text-decoration: none;
+      padding: 12px 30px;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: all 0.2s;
+      margin-top: 1rem;
+    }
+
+    .btn-home:hover {
+      background: #006ae0;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="maintenance-container">
+    <div class="icon-wrapper">
+      <i class="fa-solid fa-screwdriver-wrench"></i>
+    </div>
+    <h1>Under Development</h1>
+    <p>This tool is currently under development to provide you with a better experience. Please check back later.</p>
+    
+    <div style="margin-bottom: 2rem;">
+      <div class="status-badge">
+        <div class="dot"></div>
+        System Status: Building
+      </div>
+    </div>
+    
+    <a href="/" class="btn-home">Back to Home</a>
+  </div>
+
+  <script>
+    // Completely disable all keyboard and mouse interactions with the tool
+    window.onload = function() {
+      // Clear any potential background tasks
+      console.log("Tool paused: Development in progress.");
+    };
+
+    // Block keyboard, right-click, and selection
+    document.addEventListener('keydown', (e) => e.preventDefault());
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+    document.addEventListener('selectstart', (e) => e.preventDefault());
+  </script>
+
+</body>
+</html>

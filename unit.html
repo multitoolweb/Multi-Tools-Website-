@@ -1,0 +1,436 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO & Meta Tags -->
+    <title>Universal Unit Converter | Free Online Conversion Tool for Length, Weight & More</title>
+    <meta name="description" content="Free online unit converter tool. Instantly convert length, weight, temperature, volume, area, and speed. Switch between Metric and Imperial units easily. Fast, accurate, and mobile-friendly.">
+    <meta name="keywords" content="unit converter, online converter, metric to imperial, length converter, weight converter, temperature calculator, free conversion tool">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:title" content="Universal Unit Converter - Fast & Accurate">
+    <meta property="og:description" content="Convert any unit instantly. Supports Length, Weight, Temperature, Volume, and more.">
+    <meta property="og:type" content="website">
+
+    <!-- Schema.org Structured Data for Google Rich Results -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Universal Unit Converter",
+      "description": "A comprehensive online tool for converting units of measurement including length, weight, temperature, volume, area, and speed.",
+      "applicationCategory": "UtilityApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": "Real-time conversion, Metric and Imperial support, Mobile responsive"
+    }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f9ff; /* Very light blue bg */
+        }
+
+        /* Hide number input spinners */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .category-btn.active {
+            background-color: #2563eb; /* blue-600 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
+        }
+
+        .category-scroll::-webkit-scrollbar {
+            height: 4px;
+        }
+        .category-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .category-scroll::-webkit-scrollbar-thumb {
+            background: #bfdbfe;
+            border-radius: 4px;
+        }
+        
+        /* Smooth transitions */
+        .transition-all-300 {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Main Container -->
+    <main class="w-full max-w-xl bg-white rounded-3xl shadow-xl overflow-hidden border border-blue-100 my-8">
+        
+        <!-- Header -->
+        <header class="bg-blue-600 p-6 text-white text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-full opacity-10">
+                <i class="fas fa-ruler-combined absolute -top-4 -left-4 text-9xl transform -rotate-12"></i>
+                <i class="fas fa-balance-scale absolute -bottom-4 -right-4 text-9xl transform rotate-12"></i>
+            </div>
+            <h1 class="text-2xl font-bold relative z-10">Unit Converter</h1>
+            <p class="text-blue-100 text-sm mt-1 relative z-10">Fast & Precise Conversions</p>
+        </header>
+
+        <!-- Category Selector -->
+        <div class="bg-blue-50 border-b border-blue-100 p-4">
+            <div class="flex space-x-3 overflow-x-auto category-scroll pb-2" id="categoryContainer">
+                <!-- Categories injected by JS -->
+            </div>
+        </div>
+
+        <!-- Converter Interface -->
+        <div class="p-6 space-y-6">
+            
+            <!-- Input Group: From -->
+            <div class="relative group">
+                <label class="block text-xs font-semibold text-blue-600 uppercase tracking-wider mb-2">From</label>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <div class="relative flex-1">
+                        <input type="number" id="inputVal" placeholder="0" aria-label="Input value" class="w-full text-2xl font-medium text-gray-800 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all-300 shadow-sm" oninput="convert()">
+                    </div>
+                    <div class="relative sm:w-48">
+                        <select id="fromUnit" aria-label="From Unit" class="w-full h-full appearance-none bg-blue-50 border border-blue-200 text-blue-800 font-medium rounded-xl px-4 py-3 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer transition-all-300" onchange="convert()">
+                            <!-- Units injected by JS -->
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-blue-600">
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Swap Button -->
+            <div class="flex justify-center -my-2 relative z-10">
+                <button onclick="swapUnits()" aria-label="Swap units" class="bg-white border border-blue-100 hover:border-blue-300 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-full p-3 shadow-md hover:shadow-lg transition-all transform hover:rotate-180 duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <i class="fas fa-exchange-alt"></i>
+                </button>
+            </div>
+
+            <!-- Input Group: To -->
+            <div class="relative">
+                <label class="block text-xs font-semibold text-blue-600 uppercase tracking-wider mb-2">To</label>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <div class="relative flex-1">
+                        <input type="text" id="outputVal" placeholder="0" aria-label="Converted value" readonly class="w-full text-2xl font-bold text-blue-600 bg-blue-50/50 border border-blue-100 rounded-xl px-4 py-3 focus:outline-none shadow-sm cursor-default">
+                    </div>
+                    <div class="relative sm:w-48">
+                        <select id="toUnit" aria-label="To Unit" class="w-full h-full appearance-none bg-blue-50 border border-blue-200 text-blue-800 font-medium rounded-xl px-4 py-3 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer transition-all-300" onchange="convert()">
+                            <!-- Units injected by JS -->
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-blue-600">
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formula Display -->
+            <div id="formulaDisplay" class="bg-gray-50 rounded-lg p-3 text-center text-sm text-gray-500 hidden">
+                <!-- Formula injected by JS -->
+            </div>
+
+            <!-- Controls -->
+            <div class="pt-2 flex justify-end">
+                <button onclick="resetForm()" class="flex items-center gap-2 text-gray-400 hover:text-red-500 hover:bg-red-50 px-4 py-2 rounded-lg transition-colors text-sm font-medium">
+                    <i class="fas fa-undo-alt"></i> Reset
+                </button>
+            </div>
+
+            <!-- SEO Content / How to Use -->
+            <div class="border-t border-blue-100 pt-6 mt-4">
+                <h2 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-info-circle text-blue-500 mr-2"></i>How to Use This Converter</h2>
+                <ul class="space-y-3 text-sm text-gray-600">
+                    <li class="flex items-start">
+                        <span class="bg-blue-100 text-blue-600 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mr-3 mt-0.5 shrink-0">1</span>
+                        <span><strong>Select a Category:</strong> Choose from Length, Weight, Temp, Volume, Area, or Speed using the top menu.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="bg-blue-100 text-blue-600 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mr-3 mt-0.5 shrink-0">2</span>
+                        <span><strong>Enter Value:</strong> Type the number you wish to convert in the top input box.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="bg-blue-100 text-blue-600 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mr-3 mt-0.5 shrink-0">3</span>
+                        <span><strong>Choose Units:</strong> Select your starting unit (From) and target unit (To) from the dropdowns. The result updates automatically.</span>
+                    </li>
+                </ul>
+                <p class="text-xs text-gray-400 mt-5 leading-relaxed">
+                    Our free online unit converter provides instant, accurate conversions for Metric and Imperial systems. Whether you are a student, engineer, or chef, easily calculate measurements for school, work, or cooking.
+                </p>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // --- Data Definitions ---
+        const categories = [
+            { id: 'length', name: 'Length', icon: 'fa-ruler' },
+            { id: 'weight', name: 'Weight', icon: 'fa-weight-hanging' },
+            { id: 'temperature', name: 'Temp', icon: 'fa-thermometer-half' },
+            { id: 'volume', name: 'Volume', icon: 'fa-flask' },
+            { id: 'area', name: 'Area', icon: 'fa-chart-area' },
+            { id: 'speed', name: 'Speed', icon: 'fa-tachometer-alt' }
+        ];
+
+        // Conversion Factors (Base units: Meter, Kilogram, Liter, Square Meter, m/s)
+        // Temperature is handled separately via functions
+        const units = {
+            length: {
+                base: 'meter',
+                items: {
+                    'meter': { name: 'Meters (m)', factor: 1 },
+                    'kilometer': { name: 'Kilometers (km)', factor: 0.001 },
+                    'centimeter': { name: 'Centimeters (cm)', factor: 100 },
+                    'millimeter': { name: 'Millimeters (mm)', factor: 1000 },
+                    'inch': { name: 'Inches (in)', factor: 39.3701 },
+                    'foot': { name: 'Feet (ft)', factor: 3.28084 },
+                    'yard': { name: 'Yards (yd)', factor: 1.09361 },
+                    'mile': { name: 'Miles (mi)', factor: 0.000621371 }
+                }
+            },
+            weight: {
+                base: 'kilogram',
+                items: {
+                    'kilogram': { name: 'Kilograms (kg)', factor: 1 },
+                    'gram': { name: 'Grams (g)', factor: 1000 },
+                    'milligram': { name: 'Milligrams (mg)', factor: 1000000 },
+                    'pound': { name: 'Pounds (lb)', factor: 2.20462 },
+                    'ounce': { name: 'Ounces (oz)', factor: 35.274 }
+                }
+            },
+            volume: {
+                base: 'liter',
+                items: {
+                    'liter': { name: 'Liters (L)', factor: 1 },
+                    'milliliter': { name: 'Milliliters (ml)', factor: 1000 },
+                    'gallon_us': { name: 'Gallons (US)', factor: 0.264172 },
+                    'quart_us': { name: 'Quarts (US)', factor: 1.05669 },
+                    'pint_us': { name: 'Pints (US)', factor: 2.11338 },
+                    'cup_us': { name: 'Cups (US)', factor: 4.22675 },
+                    'fluid_ounce_us': { name: 'Fluid Ounces (US)', factor: 33.814 }
+                }
+            },
+            area: {
+                base: 'square_meter',
+                items: {
+                    'square_meter': { name: 'Square Meters (m²)', factor: 1 },
+                    'square_kilometer': { name: 'Square Kilometers (km²)', factor: 0.000001 },
+                    'square_foot': { name: 'Square Feet (ft²)', factor: 10.7639 },
+                    'square_yard': { name: 'Square Yards (yd²)', factor: 1.19599 },
+                    'acre': { name: 'Acres', factor: 0.000247105 },
+                    'hectare': { name: 'Hectares', factor: 0.0001 }
+                }
+            },
+            speed: {
+                base: 'meter_per_second',
+                items: {
+                    'meter_per_second': { name: 'Meters/Second (m/s)', factor: 1 },
+                    'kilometer_per_hour': { name: 'Kilometers/Hour (km/h)', factor: 3.6 },
+                    'mile_per_hour': { name: 'Miles/Hour (mph)', factor: 2.23694 },
+                    'knot': { name: 'Knots', factor: 1.94384 }
+                }
+            },
+            temperature: {
+                items: {
+                    'celsius': { name: 'Celsius (°C)' },
+                    'fahrenheit': { name: 'Fahrenheit (°F)' },
+                    'kelvin': { name: 'Kelvin (K)' }
+                }
+            }
+        };
+
+        let currentCategory = 'length';
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCategories();
+            loadUnits('length');
+            // Set default default values for nice initial view
+            document.getElementById('fromUnit').value = 'meter';
+            document.getElementById('toUnit').value = 'foot';
+            document.getElementById('inputVal').value = 1;
+            convert();
+        });
+
+        // --- Rendering ---
+        function renderCategories() {
+            const container = document.getElementById('categoryContainer');
+            container.innerHTML = categories.map(cat => `
+                <button onclick="changeCategory('${cat.id}')" 
+                        class="category-btn whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium text-gray-600 bg-white border border-gray-100 hover:bg-blue-50 hover:text-blue-600 transition-all ${cat.id === 'length' ? 'active' : ''}" 
+                        id="btn-${cat.id}">
+                    <i class="fas ${cat.icon} mr-2"></i>${cat.name}
+                </button>
+            `).join('');
+        }
+
+        function changeCategory(catId) {
+            currentCategory = catId;
+            
+            // Update buttons
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${catId}`).classList.add('active');
+
+            loadUnits(catId);
+            
+            // Reset values slightly for UX
+            document.getElementById('inputVal').value = 1;
+            convert();
+        }
+
+        function loadUnits(catId) {
+            const fromSelect = document.getElementById('fromUnit');
+            const toSelect = document.getElementById('toUnit');
+            const unitData = units[catId].items;
+            
+            // Create option HTML
+            // Grouping Logic: A simple heuristic for Metric vs Imperial based on names
+            const metric = [];
+            const imperial = [];
+            const other = [];
+
+            Object.keys(unitData).forEach(key => {
+                const name = unitData[key].name.toLowerCase();
+                const option = `<option value="${key}">${unitData[key].name}</option>`;
+                
+                if (name.includes('meter') || name.includes('liter') || name.includes('gram') || name.includes('celsius') || name.includes('kelvin')) {
+                    metric.push(option);
+                } else if (name.includes('inch') || name.includes('foot') || name.includes('yard') || name.includes('mile') || name.includes('pound') || name.includes('ounce') || name.includes('gallon') || name.includes('fahrenheit') || name.includes('acre')) {
+                    imperial.push(option);
+                } else {
+                    other.push(option);
+                }
+            });
+
+            // Build select HTML with groups if applicable
+            let html = '';
+            if (imperial.length > 0) {
+                html += `<optgroup label="Metric">${metric.join('')}</optgroup>`;
+                html += `<optgroup label="Imperial / US">${imperial.join('')}</optgroup>`;
+                if (other.length) html += `<optgroup label="Other">${other.join('')}</optgroup>`;
+            } else {
+                html = Object.keys(unitData).map(key => `<option value="${key}">${unitData[key].name}</option>`).join('');
+            }
+
+            fromSelect.innerHTML = html;
+            toSelect.innerHTML = html;
+
+            // Set sensible defaults so from/to aren't the same
+            const keys = Object.keys(unitData);
+            fromSelect.value = keys[0];
+            toSelect.value = keys[1] || keys[0];
+        }
+
+        // --- Logic ---
+        function swapUnits() {
+            const fromSelect = document.getElementById('fromUnit');
+            const toSelect = document.getElementById('toUnit');
+            
+            const temp = fromSelect.value;
+            fromSelect.value = toSelect.value;
+            toSelect.value = temp;
+            
+            convert();
+        }
+
+        function resetForm() {
+            document.getElementById('inputVal').value = '';
+            document.getElementById('outputVal').value = '';
+            document.getElementById('formulaDisplay').classList.add('hidden');
+        }
+
+        function convert() {
+            const inputVal = parseFloat(document.getElementById('inputVal').value);
+            const fromUnit = document.getElementById('fromUnit').value;
+            const toUnit = document.getElementById('toUnit').value;
+            const outputField = document.getElementById('outputVal');
+            const formulaDisplay = document.getElementById('formulaDisplay');
+
+            if (isNaN(inputVal)) {
+                outputField.value = '';
+                formulaDisplay.classList.add('hidden');
+                return;
+            }
+
+            let result;
+            let formulaText = "";
+
+            if (currentCategory === 'temperature') {
+                result = convertTemperature(inputVal, fromUnit, toUnit);
+                formulaText = getTempFormula(fromUnit, toUnit);
+            } else {
+                // Factor-based conversion
+                const factorFrom = units[currentCategory].items[fromUnit].factor;
+                const factorTo = units[currentCategory].items[toUnit].factor;
+                
+                // Convert to base, then to target
+                // Formula: (Value / FactorFrom) * FactorTo
+                
+                const valueInBase = inputVal / factorFrom;
+                result = valueInBase * factorTo;
+                
+                formulaText = `1 ${units[currentCategory].items[fromUnit].name} ≈ ${(factorTo/factorFrom).toPrecision(4)} ${units[currentCategory].items[toUnit].name}`;
+            }
+
+            // Formatting: limit decimals but avoid scientific notation for common numbers
+            // If integer, show integer. If float, max 6 decimals.
+            outputField.value = parseFloat(result.toFixed(6)); // Clean trailing zeros
+            
+            if (fromUnit !== toUnit) {
+                formulaDisplay.textContent = formulaText;
+                formulaDisplay.classList.remove('hidden');
+            } else {
+                formulaDisplay.classList.add('hidden');
+            }
+        }
+
+        function convertTemperature(val, from, to) {
+            if (from === to) return val;
+
+            // To Celsius
+            let celsius;
+            if (from === 'celsius') celsius = val;
+            else if (from === 'fahrenheit') celsius = (val - 32) * (5/9);
+            else if (from === 'kelvin') celsius = val - 273.15;
+
+            // From Celsius to Target
+            if (to === 'celsius') return celsius;
+            if (to === 'fahrenheit') return (celsius * 9/5) + 32;
+            if (to === 'kelvin') return celsius + 273.15;
+        }
+
+        function getTempFormula(from, to) {
+            if (from === 'celsius' && to === 'fahrenheit') return `(°C × 9/5) + 32 = °F`;
+            if (from === 'celsius' && to === 'kelvin') return `°C + 273.15 = K`;
+            if (from === 'fahrenheit' && to === 'celsius') return `(°F − 32) × 5/9 = °C`;
+            if (from === 'fahrenheit' && to === 'kelvin') return `(°F − 32) × 5/9 + 273.15 = K`;
+            if (from === 'kelvin' && to === 'celsius') return `K − 273.15 = °C`;
+            if (from === 'kelvin' && to === 'fahrenheit') return `(K − 273.15) × 9/5 + 32 = °F`;
+            return "";
+        }
+
+    </script>
+</body>
+</html>
+
+

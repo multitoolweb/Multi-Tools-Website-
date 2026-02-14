@@ -1,0 +1,375 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pro Code Minifier</title>
+  <style>
+    /* Professional Blue & White Theme */
+    :root {
+      --primary: #007bff;
+      --primary-hover: #0056b3;
+      --bg: #f0f8ff;
+      --card-bg: #ffffff;
+      --border: #d1d9e0;
+      --success: #28a745;
+      --dark-panel: #272822;
+    }
+
+    body {
+      font-family: 'SF Mono', 'Fira Code', 'Segoe UI', Tahoma, sans-serif;
+      background: var(--bg);
+      margin: 0;
+      padding: 30px 15px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app-container {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 800px;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0, 123, 255, 0.1);
+    }
+
+    h2 {
+      color: var(--primary);
+      text-align: center;
+      margin-top: 0;
+      font-weight: 700;
+      margin-bottom: 25px;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 10px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    #textBox {
+      width: 100%;
+      min-height: 250px;
+      padding: 15px;
+      font-size: 14px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+      box-sizing: border-box;
+      background: #fff;
+      white-space: pre;
+      overflow: auto;
+      transition: border-color 0.3s;
+    }
+
+    #textBox:focus {
+      border-color: var(--primary);
+    }
+
+    #textBox:empty:before {
+      content: attr(placeholder);
+      color: #adb5bd;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .btn-minify {
+      flex: 2;
+      background-color: var(--primary);
+      color: white;
+      font-size: 16px;
+    }
+
+    .btn-minify:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .btn-clear {
+      flex: 1;
+      background-color: #f8f9fa;
+      border: 1px solid var(--border);
+      color: #444;
+    }
+
+    .btn-clear:hover {
+      background-color: #eee;
+    }
+
+    .btn-util {
+      background: #eef6ff;
+      color: var(--primary);
+      font-size: 12px;
+      padding: 6px 12px;
+    }
+
+    .btn-util:hover {
+      background: #d0e5ff;
+    }
+
+    /* Results Dashboard */
+    #result-dashboard {
+      display: none;
+      margin-top: 30px;
+      border-top: 2px solid #eee;
+      padding-top: 20px;
+    }
+
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .stat-card {
+      background: #f8fbff;
+      padding: 10px;
+      border-radius: 6px;
+      text-align: center;
+      border: 1px solid #e1eefc;
+    }
+
+    .stat-card small {
+      display: block;
+      color: #777;
+      font-size: 11px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .stat-card span {
+      font-weight: bold;
+      color: var(--primary);
+    }
+
+    .output-wrapper {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .output-header {
+      background: #333;
+      padding: 8px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .output-title {
+      color: #aaa;
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    #output {
+      width: 100%;
+      max-height: 250px;
+      padding: 15px;
+      background: var(--dark-panel);
+      color: #f8f8f2;
+      border: none;
+      font-size: 13px;
+      line-height: 1.5;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      box-sizing: border-box;
+    }
+
+    .btn-copy-result {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .btn-copy-result:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .status-msg {
+      text-align: center;
+      font-size: 12px;
+      margin-top: 10px;
+      height: 15px;
+      color: var(--success);
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <h2>Code Minifier Pro</h2>
+
+  <div class="toolbar">
+    <div>
+      <span style="font-weight: bold; color: #444;">Source Code</span>
+      <div id="sourceSize" style="font-size: 12px;">0 B</div>
+    </div>
+    <div class="toolbar-actions">
+      <button class="btn-util" onclick="pasteFromClipboard()">Paste Code</button>
+    </div>
+  </div>
+  
+  <div id="textBox" contenteditable="true" placeholder="Paste HTML, CSS, or JS here..." oninput="updateStats()"></div>
+
+  <div class="actions">
+    <button class="btn-minify" onclick="processMinification()">Minify Now</button>
+    <button class="btn-clear" onclick="clearAll()">Clear</button>
+  </div>
+
+  <div id="result-dashboard">
+    <div class="stats-bar">
+      <div class="stat-card">
+        <small>Original</small>
+        <span id="statOriginal">0 B</span>
+      </div>
+      <div class="stat-card">
+        <small>Minified</small>
+        <span id="statMinified">0 B</span>
+      </div>
+      <div class="stat-card">
+        <small>Savings</small>
+        <span id="statSavings" style="color: var(--success);">0%</span>
+      </div>
+    </div>
+
+    <div class="output-wrapper">
+      <div class="output-header">
+        <span class="output-title">Minified Result</span>
+        <button class="btn-copy-result" id="copyBtn" onclick="copyResult()">Copy Code</button>
+      </div>
+      <div id="output"></div>
+    </div>
+    <div id="statusMsg" class="status-msg"></div>
+  </div>
+</div>
+
+<script>
+  function formatBytes(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+  function updateStats() {
+    const text = document.getElementById("textBox").innerText;
+    document.getElementById("sourceSize").innerText = formatBytes(new Blob([text]).size);
+  }
+
+  async function pasteFromClipboard() {
+    try {
+      const text = await navigator.clipboard.readText();
+      const box = document.getElementById("textBox");
+      box.innerText = text;
+      updateStats();
+    } catch (err) {
+      // Fallback if permission denied
+      alert("Click the text area and press Ctrl+V to paste.");
+    }
+  }
+
+  function minifyEngine(code) {
+    // Remove Multi-line comments
+    code = code.replace(/\/\*[\s\S]*?\*\/|<!--[\s\S]*?-->/g, '');
+    // Remove Single-line comments
+    code = code.replace(/^\s*\/\/.*$/gm, '');
+    // Remove newlines and extra spaces
+    code = code.replace(/\s+/g, ' ');
+    // Remove space around symbols
+    code = code.replace(/\s*([\{\}\[\]\(\)\:\;\,\=\+\-\*\/])\s*/g, '$1');
+    return code.trim();
+  }
+
+  function processMinification() {
+    const content = document.getElementById("textBox").innerText.trim();
+    if (!content) return;
+
+    const originalSize = new Blob([content]).size;
+    const minified = minifyEngine(content);
+    const minifiedSize = new Blob([minified]).size;
+    const savings = originalSize > 0 ? ((originalSize - minifiedSize) / originalSize * 100).toFixed(1) : 0;
+
+    document.getElementById("output").innerText = minified;
+    document.getElementById("statOriginal").innerText = formatBytes(originalSize);
+    document.getElementById("statMinified").innerText = formatBytes(minifiedSize);
+    document.getElementById("statSavings").innerText = savings + "%";
+    
+    document.getElementById("result-dashboard").style.display = "block";
+    document.getElementById("statusMsg").innerText = "";
+  }
+
+  function clearAll() {
+    document.getElementById("textBox").innerText = "";
+    document.getElementById("result-dashboard").style.display = "none";
+    updateStats();
+  }
+
+  function copyResult() {
+    const text = document.getElementById("output").innerText;
+    
+    // Stable copy method for iframes
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    
+    try {
+      document.execCommand('copy');
+      const btn = document.getElementById("copyBtn");
+      const status = document.getElementById("statusMsg");
+      
+      btn.innerText = "✓ Copied";
+      status.innerText = "Code copied to clipboard!";
+      
+      setTimeout(() => { 
+        btn.innerText = "Copy Code"; 
+        status.innerText = "";
+      }, 2000);
+    } catch (err) {
+      console.error('Fallback copy failed', err);
+    }
+    
+    document.body.removeChild(textArea);
+  }
+</script>
+
+</body>
+</html>
+

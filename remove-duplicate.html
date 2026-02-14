@@ -1,0 +1,740 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Duplicate Line Remover | Free Online Text Processing Tool</title>
+    <meta name="description" content="Remove duplicate lines from text instantly. Clean lists, deduplicate data, and process text with advanced options. 100% free online tool.">
+    <meta name="keywords" content="duplicate line remover, remove duplicates, text cleaner, deduplicate lines, online text tool, data cleaning, unique lines extractor">
+    <meta name="author" content="Duplicate Line Remover Tool">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Duplicate Line Remover | Free Online Text Processing Tool">
+    <meta property="og:description" content="Clean your lists and remove redundant data with our powerful duplicate line remover.">
+    <meta property="og:type" content="website">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Duplicate Line Remover",
+        "applicationCategory": "UtilityApplication",
+        "description": "Online tool to remove duplicate lines from text with advanced options",
+        "operatingSystem": "Any",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "featureList": [
+            "Remove duplicate lines",
+            "Case-insensitive option",
+            "Trim whitespace",
+            "Sort alphabetically",
+            "Keep empty lines option",
+            "Statistics counter"
+        ]
+    }
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin: 0 0 10px 0;
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: #555;
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .tool-container {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 1.5rem;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            border-color: #007bff;
+            box-shadow: 0 2px 8px rgba(0,123,255,0.1);
+        }
+
+        .option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .option label {
+            font-weight: 500;
+            color: #495057;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .text-area-container {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        #textBox {
+            width: 100%;
+            min-height: 300px;
+            max-height: 500px;
+            padding: 20px;
+            font-size: 15px;
+            line-height: 1.5;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            background: #fff;
+            outline: none;
+            overflow-y: auto;
+            box-sizing: border-box;
+            white-space: pre;
+            word-wrap: normal;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            tab-size: 4;
+            resize: vertical;
+        }
+
+        #textBox:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .textarea-placeholder {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #aaa;
+            pointer-events: none;
+            font-size: 15px;
+        }
+
+        #textBox:not(:empty) + .textarea-placeholder {
+            display: none;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 1.5rem;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 140px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0056b3, #004085);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,91,187,0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108,117,125,0.3);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220,53,69,0.3);
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        #toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .info-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-top: 30px;
+        }
+
+        .section-title {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #007bff;
+        }
+
+        .feature-list, .use-case-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li, .use-case-list li {
+            padding: 10px 0 10px 30px;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            color: #28a745;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .use-case-list li:before {
+            content: "•";
+            color: #007bff;
+            position: absolute;
+            left: 0;
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        .example-container {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #007bff;
+        }
+
+        .example-title {
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        .example-code {
+            font-family: 'Consolas', monospace;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-bar {
+                grid-template-columns: 1fr;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tool-container {
+                padding: 1rem;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .info-section {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <!-- Header -->
+    <header class="header">
+        <h1>Duplicate Line Remover</h1>
+        <p>Remove duplicate lines from text instantly. Clean your lists, deduplicate data, and process text with advanced options. 100% free, no registration required.</p>
+    </header>
+
+    <!-- Tool Container -->
+    <div class="tool-container">
+        <div class="controls">
+            <div class="option-group">
+                <div class="option">
+                    <input type="checkbox" id="caseInsensitive" checked>
+                    <label for="caseInsensitive">Ignore Case</label>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="trimLines" checked>
+                    <label for="trimLines">Trim Whitespace</label>
+                </div>
+            </div>
+            <div class="option-group">
+                <div class="option">
+                    <input type="checkbox" id="sortAlphabetically">
+                    <label for="sortAlphabetically">Sort Alphabetically</label>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="keepEmpty">
+                    <label for="keepEmpty">Keep Empty Lines</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-area-container">
+            <div id="textBox" 
+                 contenteditable="true" 
+                 spellcheck="false"></div>
+            <div class="textarea-placeholder">Paste your text here (each item on a new line)...</div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-primary" onclick="removeDuplicates()">
+                <span>✨</span> Remove Duplicates
+            </button>
+            <button class="btn-secondary" onclick="copyToClipboard()">
+                <span>📋</span> Copy Result
+            </button>
+            <button class="btn-danger" onclick="clearText()">
+                <span>🗑️</span> Clear All
+            </button>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                Original Lines
+                <span class="stat-number" id="origCount">0</span>
+            </div>
+            <div class="stat-item">
+                Unique Lines
+                <span class="stat-number" id="uniqueCount">0</span>
+            </div>
+            <div class="stat-item">
+                Removed
+                <span class="stat-number" id="removedCount">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Information Section -->
+    <div class="info-section">
+        <h2 class="section-title">How to Use This Tool</h2>
+        <p>This tool helps you quickly remove duplicate lines from any text. Here's how it works:</p>
+        
+        <div class="example-container">
+            <div class="example-title">Example Input:</div>
+            <div class="example-code">
+apple<br>
+banana<br>
+APPLE<br>
+banana<br>
+Orange<br>
+apple<br>
+            </div>
+        </div>
+        
+        <div class="example-container">
+            <div class="example-title">With "Ignore Case" enabled:</div>
+            <div class="example-code">
+apple<br>
+banana<br>
+Orange<br>
+            </div>
+        </div>
+
+        <h3 class="section-title" style="margin-top: 30px;">Features</h3>
+        <ul class="feature-list">
+            <li><strong>Ignore Case:</strong> Treat uppercase and lowercase as same (e.g., "Apple" = "apple")</li>
+            <li><strong>Trim Whitespace:</strong> Automatically remove spaces from start/end of each line</li>
+            <li><strong>Sort Alphabetically:</strong> Arrange unique lines in alphabetical order</li>
+            <li><strong>Keep Empty Lines:</strong> Option to preserve blank lines in output</li>
+            <li><strong>Real-time Statistics:</strong> See counts for original, unique, and removed lines</li>
+            <li><strong>One-click Copy:</strong> Copy cleaned text directly to clipboard</li>
+        </ul>
+
+        <h3 class="section-title" style="margin-top: 30px;">Common Use Cases</h3>
+        <ul class="use-case-list">
+            <li><strong>Email Lists:</strong> Clean duplicate email addresses from mailing lists</li>
+            <li><strong>Data Processing:</strong> Remove duplicate entries from CSV or text files</li>
+            <li><strong>Programming:</strong> Clean up duplicate lines in code or configuration files</li>
+            <li><strong>Content Writing:</strong> Find and remove duplicate sentences or paragraphs</li>
+            <li><strong>Inventory Management:</strong> Deduplicate product or item lists</li>
+            <li><strong>Research:</strong> Process survey responses or research data</li>
+        </ul>
+
+        <h3 class="section-title" style="margin-top: 30px;">Tips for Best Results</h3>
+        <div class="example-container">
+            <ul style="list-style-type: none; padding: 0;">
+                <li>1. Use "Ignore Case" for case-insensitive deduplication</li>
+                <li>2. Enable "Trim Whitespace" to clean lines with extra spaces</li>
+                <li>3. Sort results alphabetically for organized output</li>
+                <li>4. Check "Keep Empty Lines" if you want to preserve formatting</li>
+                <li>5. Use the Copy button to easily paste results elsewhere</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="text-align: center; margin-top: 40px; padding: 20px; color: #666; font-size: 0.9rem;">
+        <p>© 2024 Duplicate Line Remover Tool | Free Online Utility | 
+           <a href="#privacy" style="color: #007bff; text-decoration: none;">Privacy</a> | 
+           <a href="#terms" style="color: #007bff; text-decoration: none;">Terms</a> | 
+           <a href="#contact" style="color: #007bff; text-decoration: none;">Contact</a>
+        </p>
+        <p style="margin-top: 10px; font-size: 0.8rem;">All processing happens locally in your browser. No data is sent to any server.</p>
+    </footer>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast"></div>
+
+<script>
+    // DOM Elements
+    const textBox = document.getElementById('textBox');
+    const toast = document.getElementById('toast');
+    const origCount = document.getElementById('origCount');
+    const uniqueCount = document.getElementById('uniqueCount');
+    const removedCount = document.getElementById('removedCount');
+
+    // Show toast notification
+    function showToast(message, type = 'success') {
+        toast.innerHTML = message;
+        toast.className = '';
+        toast.classList.add('show');
+        
+        // Auto-hide after 3 seconds
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+
+    // Update statistics
+    function updateStats(lines, uniqueLines) {
+        const original = lines.length;
+        const unique = uniqueLines.length;
+        const removed = original - unique;
+        
+        origCount.textContent = original;
+        uniqueCount.textContent = unique;
+        removedCount.textContent = removed;
+    }
+
+    // Remove duplicates function
+    function removeDuplicates() {
+        const content = textBox.innerText;
+        if (!content.trim()) {
+            showToast('Please enter some text first!', 'warning');
+            return;
+        }
+
+        // Get options
+        const ignoreCase = document.getElementById('caseInsensitive').checked;
+        const trimLines = document.getElementById('trimLines').checked;
+        const sortLines = document.getElementById('sortAlphabetically').checked;
+        const keepEmpty = document.getElementById('keepEmpty').checked;
+
+        // Split by newline characters
+        let lines = content.split(/\r?\n/);
+        const seen = new Set();
+        const result = [];
+
+        // Process each line
+        lines.forEach((line, index) => {
+            let processedLine = line;
+            
+            // Trim whitespace if enabled
+            if (trimLines) {
+                processedLine = processedLine.trim();
+            }
+            
+            // Handle empty lines
+            if (processedLine === '' || processedLine === null || processedLine === undefined) {
+                if (keepEmpty) {
+                    result.push('');
+                }
+                return;
+            }
+
+            // Create comparison key
+            let comparisonKey = processedLine;
+            if (ignoreCase) {
+                comparisonKey = comparisonKey.toLowerCase();
+            }
+
+            // Check for duplicates
+            if (!seen.has(comparisonKey)) {
+                seen.add(comparisonKey);
+                result.push(processedLine);
+            }
+        });
+
+        // Sort if enabled
+        if (sortLines) {
+            result.sort((a, b) => {
+                if (ignoreCase) {
+                    return a.toLowerCase().localeCompare(b.toLowerCase());
+                }
+                return a.localeCompare(b);
+            });
+        }
+
+        // Update text box
+        textBox.innerText = result.join('\n');
+        
+        // Update statistics
+        updateStats(lines, result);
+        
+        // Show success message
+        const duplicatesRemoved = lines.length - result.length;
+        showToast(`Removed ${duplicatesRemoved} duplicate line${duplicatesRemoved !== 1 ? 's' : ''}!`);
+    }
+
+    // Copy to clipboard
+    function copyToClipboard() {
+        const text = textBox.innerText;
+        if (!text.trim()) {
+            showToast('Nothing to copy!', 'warning');
+            return;
+        }
+
+        // Using modern clipboard API
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('Copied to clipboard! ✓');
+        }).catch(err => {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showToast('Copied to clipboard! ✓');
+        });
+    }
+
+    // Clear text
+    function clearText() {
+        textBox.innerText = '';
+        updateStats([], []);
+        showToast('Text cleared!');
+        textBox.focus();
+    }
+
+    // Auto-update stats on input
+    textBox.addEventListener('input', function() {
+        const content = textBox.innerText;
+        const lines = content.split(/\r?\n/);
+        
+        // Remove empty lines from count if needed
+        const nonEmptyLines = lines.filter(line => {
+            const trimmed = line.trim();
+            return trimmed !== '';
+        });
+        
+        updateStats(lines, nonEmptyLines);
+    });
+
+    // Handle paste event
+    textBox.addEventListener('paste', function(e) {
+        // Let paste happen first
+        setTimeout(() => {
+            const content = textBox.innerText;
+            const lines = content.split(/\r?\n/);
+            const nonEmptyLines = lines.filter(line => line.trim() !== '');
+            updateStats(lines, nonEmptyLines);
+            showToast('Text pasted!');
+        }, 0);
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            removeDuplicates();
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+            if (document.activeElement === textBox) {
+                setTimeout(copyToClipboard, 100);
+            }
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key === 'l') {
+            e.preventDefault();
+            clearText();
+        }
+    });
+
+    // Initialize with example text
+    function loadExample() {
+        const exampleText = `apple
+banana
+Apple
+banana
+orange
+  apple  
+Orange
+grape
+GRAPE`;
+        textBox.innerText = exampleText;
+        const lines = exampleText.split(/\r?\n/);
+        const nonEmptyLines = lines.filter(line => line.trim() !== '');
+        updateStats(lines, nonEmptyLines);
+    }
+
+    // Load example on first visit
+    window.addEventListener('load', function() {
+        if (!textBox.innerText.trim()) {
+            setTimeout(loadExample, 500);
+        }
+    });
+</script>
+
+</body>
+</html>

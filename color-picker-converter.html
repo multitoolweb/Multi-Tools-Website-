@@ -1,0 +1,434 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Color Picker - Utila</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #007bff;
+      --bg: #f2f9ff;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --border: #e2e8f0;
+      --input-bg: #f8fbff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      background: var(--card-bg);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 123, 255, 0.05);
+      padding: 2rem;
+      border: 1px solid rgba(0, 123, 255, 0.1);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .header h1 {
+      color: var(--primary);
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    /* Main Picker Board Section */
+    .picker-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .board-container {
+      display: flex;
+      gap: 10px;
+      height: 200px;
+    }
+
+    #previewColor {
+      flex: 1;
+      border-radius: 12px;
+      background-color: #03fc45;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
+    }
+
+    .canvas-wrapper {
+      flex: 2;
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: crosshair;
+    }
+
+    #colorBoard {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .picker-cursor {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border: 2px solid white;
+      border-radius: 50%;
+      box-shadow: 0 0 4px rgba(0,0,0,0.5);
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Slider Section */
+    .slider-container {
+      padding: 0.5rem 0;
+    }
+
+    #hueSlider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 12px;
+      border-radius: 6px;
+      outline: none;
+      background: linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
+      cursor: pointer;
+    }
+
+    #hueSlider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border: 3px solid var(--primary);
+      border-radius: 50%;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    /* Values Grid */
+    .values-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .value-box {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .value-box.full { grid-column: 1 / -1; }
+
+    .label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .value-box input {
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-family: monospace;
+      font-size: 0.95rem;
+      width: 100%;
+      outline: none;
+    }
+
+    .copy-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #cbd5e1;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .copy-btn:hover { color: var(--primary); }
+
+    .btn-sync {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: 0.2s;
+    }
+
+    .btn-sync:hover { background: #006ae0; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>Utila Color Picker</h1>
+  </div>
+
+  <div class="picker-layout">
+    <!-- Visual Picker -->
+    <div class="board-container">
+      <div id="previewColor"></div>
+      <div class="canvas-wrapper" id="boardWrapper">
+        <canvas id="colorBoard"></canvas>
+        <div class="picker-cursor" id="pickerCursor"></div>
+      </div>
+    </div>
+
+    <!-- Hue Slider -->
+    <div class="slider-container">
+      <input type="range" id="hueSlider" min="0" max="360" value="136">
+    </div>
+
+    <!-- Conversion Fields -->
+    <div class="values-grid">
+      <div class="value-box full">
+        <span class="label">HEX</span>
+        <input type="text" id="hexVal" readonly>
+        <i class="fa-regular fa-copy copy-btn" onclick="copy('hexVal')"></i>
+      </div>
+      
+      <div class="value-box">
+        <span class="label">RGB</span>
+        <input type="text" id="rgbVal" readonly>
+      </div>
+      
+      <div class="value-box">
+        <span class="label">CMYK</span>
+        <input type="text" id="cmykVal" readonly>
+      </div>
+
+      <div class="value-box">
+        <span class="label">HSV</span>
+        <input type="text" id="hsvVal" readonly>
+      </div>
+
+      <div class="value-box">
+        <span class="label">HSL</span>
+        <input type="text" id="hslVal" readonly>
+      </div>
+    </div>
+
+    <button class="btn-sync" onclick="resetToInitial()">
+      <i class="fa-solid fa-rotate-left"></i> Reset to Default
+    </button>
+  </div>
+</div>
+
+<script>
+  const canvas = document.getElementById('colorBoard');
+  const ctx = canvas.getContext('2d');
+  const hueSlider = document.getElementById('hueSlider');
+  const preview = document.getElementById('previewColor');
+  const cursor = document.getElementById('pickerCursor');
+  const boardWrapper = document.getElementById('boardWrapper');
+
+  let currentHue = 136;
+  let currentX = 0;
+  let currentY = 0;
+
+  function init() {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    
+    // Default position (top right-ish)
+    currentX = canvas.width * 0.8;
+    currentY = canvas.height * 0.2;
+    
+    drawBoard();
+    updateUI();
+
+    // Event Listeners
+    boardWrapper.addEventListener('mousedown', startPicking);
+    window.addEventListener('mousemove', movePicking);
+    window.addEventListener('mouseup', stopPicking);
+    
+    hueSlider.addEventListener('input', (e) => {
+      currentHue = e.target.value;
+      drawBoard();
+      updateUI();
+    });
+
+    window.addEventListener('resize', () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      drawBoard();
+    });
+  }
+
+  let isPicking = false;
+
+  function startPicking(e) {
+    isPicking = true;
+    movePicking(e);
+  }
+
+  function movePicking(e) {
+    if (!isPicking) return;
+    const rect = boardWrapper.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    currentX = Math.max(0, Math.min(x, canvas.width));
+    currentY = Math.max(0, Math.min(y, canvas.height));
+
+    cursor.style.left = currentX + 'px';
+    cursor.style.top = currentY + 'px';
+
+    updateUI();
+  }
+
+  function stopPicking() { isPicking = false; }
+
+  function drawBoard() {
+    // Fill base hue
+    ctx.fillStyle = `hsl(${currentHue}, 100%, 50%)`;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // White gradient (left to right)
+    let whiteGrad = ctx.createLinearGradient(0, 0, canvas.width, 0);
+    whiteGrad.addColorStop(0, '#fff');
+    whiteGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = whiteGrad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Black gradient (bottom to top)
+    let blackGrad = ctx.createLinearGradient(0, canvas.height, 0, 0);
+    blackGrad.addColorStop(0, '#000');
+    blackGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = blackGrad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
+  function updateUI() {
+    const imageData = ctx.getImageData(currentX, currentY, 1, 1).data;
+    const r = imageData[0], g = imageData[1], b = imageData[2];
+    const hex = rgbToHex(r, g, b);
+
+    preview.style.backgroundColor = hex;
+    document.getElementById('hexVal').value = hex;
+    document.getElementById('rgbVal').value = `${r}, ${g}, ${b}`;
+    
+    // Conversions
+    const hsv = rgbToHsv(r, g, b);
+    document.getElementById('hsvVal').value = `${hsv.h}°, ${hsv.s}%, ${hsv.v}%`;
+    
+    const hsl = rgbToHsl(r, g, b);
+    document.getElementById('hslVal').value = `${hsl.h}°, ${hsl.s}%, ${hsl.l}%`;
+    
+    document.getElementById('cmykVal').value = rgbToCmyk(r, g, b);
+
+    // Set cursor color for visibility
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    cursor.style.borderColor = brightness > 125 ? 'black' : 'white';
+  }
+
+  // --- MATH HELPERS ---
+  function rgbToHex(r, g, b) {
+    return "#" + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase();
+  }
+
+  function rgbToHsv(r, g, b) {
+    r /= 255, g /= 255, b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    const d = max - min;
+    let h, s = (max === 0 ? 0 : d / max), v = max;
+    if (max === min) h = 0;
+    else {
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+    }
+    return { h: Math.round(h * 360), s: Math.round(s * 100), v: Math.round(v * 100) };
+  }
+
+  function rgbToHsl(r, g, b) {
+    r /= 255, g /= 255, b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+    if (max === min) h = s = 0;
+    else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+    }
+    return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+  }
+
+  function rgbToCmyk(r, g, b) {
+    let c = 1 - (r / 255), m = 1 - (g / 255), y = 1 - (b / 255);
+    let k = Math.min(c, m, y);
+    c = Math.round(((c - k) / (1 - k)) * 100) || 0;
+    m = Math.round(((m - k) / (1 - k)) * 100) || 0;
+    y = Math.round(((y - k) / (1 - k)) * 100) || 0;
+    k = Math.round(k * 100);
+    return `${c}%, ${m}%, ${y}%, ${k}%`;
+  }
+
+  function copy(id) {
+    const el = document.getElementById(id);
+    el.select();
+    document.execCommand('copy');
+    // Simple feedback
+    const originalValue = el.value;
+    el.value = "COPIED!";
+    setTimeout(() => el.value = originalValue, 1000);
+  }
+
+  function resetToInitial() {
+    hueSlider.value = 136;
+    currentHue = 136;
+    currentX = canvas.width * 0.8;
+    currentY = canvas.height * 0.2;
+    cursor.style.left = currentX + 'px';
+    cursor.style.top = currentY + 'px';
+    drawBoard();
+    updateUI();
+  }
+
+  window.onload = init;
+</script>
+ <script async="async" data-cfasync="false" src="https://pl28699215.effectivegatecpm.com/6638ee3f7ef875c60276d1e326e6d7e3/invoke.js"></script>
+<div id="container-6638ee3f7ef875c60276d1e326e6d7e3"></div>
+
+</body>
+</html>
+
+
+

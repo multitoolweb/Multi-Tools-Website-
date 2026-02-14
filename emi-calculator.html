@@ -1,0 +1,322 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Loan EMI Pro Planner</title>
+  <style>
+    :root {
+      --primary: #007bff;
+      --secondary: #6c757d;
+      --principal-color: #007bff;
+      --interest-color: #ff4757;
+      --bg: #f8f9fa;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+      width: 100%;
+      max-width: 600px;
+    }
+
+    h1 {
+      color: var(--primary);
+      text-align: center;
+      margin-top: 0;
+      font-size: 24px;
+    }
+
+    .input-section {
+      margin-bottom: 25px;
+    }
+
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 600;
+      color: #444;
+      margin-bottom: 8px;
+    }
+
+    .field-label span:last-child {
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+
+    .manual-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      font-size: 12px;
+      color: #888;
+      text-transform: uppercase;
+      font-weight: 700;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #edf2f7;
+      border-radius: 10px;
+      font-size: 16px;
+      box-sizing: border-box;
+      outline: none;
+    }
+
+    .results-card {
+      background: #f1f3f5;
+      padding: 20px;
+      border-radius: 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+
+    .res-box { text-align: center; }
+    .res-box .label { font-size: 13px; color: #666; }
+    .res-box .value { font-size: 18px; font-weight: 800; color: #333; margin-top: 4px; }
+    .res-box.full { grid-column: span 2; border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 5px; }
+    .res-box.full .value { font-size: 28px; color: var(--primary); }
+
+    /* Visual Breakdown Bar */
+    .breakdown-bar {
+      height: 12px;
+      background: #eee;
+      border-radius: 6px;
+      display: flex;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+
+    .p-bar { background: var(--principal-color); height: 100%; transition: width 0.3s; }
+    .i-bar { background: var(--interest-color); height: 100%; transition: width 0.3s; }
+
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      font-size: 12px;
+      color: #666;
+    }
+
+    .legend-item i {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      margin-right: 5px;
+    }
+
+    /* Schedule Table */
+    .schedule-toggle {
+      background: transparent;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    #scheduleTable {
+      margin-top: 20px;
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      display: none;
+    }
+
+    #scheduleTable th { background: #f8f9fa; color: #666; padding: 10px; text-align: left; }
+    #scheduleTable td { padding: 10px; border-bottom: 1px solid #eee; }
+
+    @media (max-width: 500px) {
+      .container { padding: 20px; }
+      .results-card { grid-template-columns: 1fr; }
+      .res-box.full { grid-column: span 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>EMI Pro Planner</h1>
+
+    <div class="input-section">
+      <div class="field-label">
+        <span>Loan Amount</span>
+        <span id="labelAmount">₹ 10,00,000</span>
+      </div>
+      <input type="range" id="rangeAmount" min="100000" max="10000000" step="50000" value="1000000" oninput="syncInputs('amount')">
+      
+      <div class="field-label">
+        <span>Interest Rate (P.A)</span>
+        <span id="labelRate">8.5%</span>
+      </div>
+      <input type="range" id="rangeRate" min="1" max="20" step="0.1" value="8.5" oninput="syncInputs('rate')">
+
+      <div class="field-label">
+        <span>Tenure (Months)</span>
+        <span id="labelTenure">120 Months</span>
+      </div>
+      <input type="range" id="rangeTenure" min="6" max="360" step="6" value="120" oninput="syncInputs('tenure')">
+    </div>
+
+    <div class="manual-inputs">
+      <div class="input-group">
+        <label>Manual Amount</label>
+        <input type="number" id="numAmount" value="1000000" onchange="syncRanges()">
+      </div>
+      <div class="input-group">
+        <label>Rate (%)</label>
+        <input type="number" id="numRate" value="8.5" step="0.1" onchange="syncRanges()">
+      </div>
+    </div>
+
+    <div class="results-card">
+      <div class="res-box full">
+        <div class="label">Monthly EMI</div>
+        <div class="value" id="resEMI">₹ 0</div>
+      </div>
+      <div class="res-box">
+        <div class="label">Total Interest</div>
+        <div class="value" id="resInterest">₹ 0</div>
+      </div>
+      <div class="res-box">
+        <div class="label">Total Amount</div>
+        <div class="value" id="resTotal">₹ 0</div>
+      </div>
+    </div>
+
+    <div class="breakdown-bar">
+      <div class="p-bar" id="pBar" style="width: 70%;"></div>
+      <div class="i-bar" id="iBar" style="width: 30%;"></div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><i style="background: var(--principal-color);"></i> Principal</div>
+      <div class="legend-item"><i style="background: var(--interest-color);"></i> Interest</div>
+    </div>
+
+    <button class="schedule-toggle" onclick="toggleSchedule()">View Amortization Schedule</button>
+    
+    <table id="scheduleTable">
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th>Principal</th>
+          <th>Interest</th>
+          <th>Balance</th>
+        </tr>
+      </thead>
+      <tbody id="scheduleBody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
+
+    function syncInputs(type) {
+      if(type === 'amount') {
+        document.getElementById('numAmount').value = document.getElementById('rangeAmount').value;
+      } else if(type === 'rate') {
+        document.getElementById('numRate').value = document.getElementById('rangeRate').value;
+      }
+      calculate();
+    }
+
+    function syncRanges() {
+      document.getElementById('rangeAmount').value = document.getElementById('numAmount').value;
+      document.getElementById('rangeRate').value = document.getElementById('numRate').value;
+      calculate();
+    }
+
+    function calculate() {
+      const P = parseFloat(document.getElementById('numAmount').value);
+      const annualR = parseFloat(document.getElementById('numRate').value);
+      const N = parseInt(document.getElementById('rangeTenure').value);
+
+      document.getElementById('labelAmount').innerText = fmt.format(P);
+      document.getElementById('labelRate').innerText = annualR + '%';
+      document.getElementById('labelTenure').innerText = N + ' Months (' + (N/12).toFixed(1) + ' Years)';
+
+      const R = annualR / 12 / 100;
+      const emi = (P * R * Math.pow(1 + R, N)) / (Math.pow(1 + R, N) - 1);
+      
+      const totalPayment = emi * N;
+      const totalInterest = totalPayment - P;
+
+      document.getElementById('resEMI').innerText = fmt.format(emi);
+      document.getElementById('resInterest').innerText = fmt.format(totalInterest);
+      document.getElementById('resTotal').innerText = fmt.format(totalPayment);
+
+      // Update Chart
+      const pPerc = (P / totalPayment) * 100;
+      const iPerc = (totalInterest / totalPayment) * 100;
+      document.getElementById('pBar').style.width = pPerc + '%';
+      document.getElementById('iBar').style.width = iPerc + '%';
+
+      generateSchedule(P, R, emi, N);
+    }
+
+    function generateSchedule(P, R, emi, N) {
+      const body = document.getElementById('scheduleBody');
+      body.innerHTML = '';
+      let balance = P;
+      
+      // Limit schedule display for UI performance
+      for (let i = 1; i <= N; i++) {
+        const interest = balance * R;
+        const principal = emi - interest;
+        balance = balance - principal;
+        
+        if (i <= 12 || i % 12 === 0 || i === N) { // Show first year, then annual snapshots, then last month
+          const row = `<tr>
+            <td>${i}</td>
+            <td>${fmt.format(principal)}</td>
+            <td>${fmt.format(interest)}</td>
+            <td>${fmt.format(Math.max(0, balance))}</td>
+          </tr>`;
+          body.innerHTML += row;
+        }
+      }
+    }
+
+    function toggleSchedule() {
+      const table = document.getElementById('scheduleTable');
+      table.style.display = table.style.display === 'table' ? 'none' : 'table';
+    }
+
+    // Initial calc
+    calculate();
+  </script>
+</body>
+</html>
+
+
+  

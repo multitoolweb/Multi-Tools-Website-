@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Professional GST Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4faff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+      text-align: center;
+      width: 90%;
+      max-width: 420px;
+    }
+
+    h1 {
+      color: #007bff;
+      margin-bottom: 20px;
+      margin-top: 0;
+    }
+
+    /* Input Styling */
+    .input-group {
+      text-align: left;
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #555;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      box-sizing: border-box; /* Ensures padding doesn't affect width */
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #007bff;
+    }
+
+    /* Tax Type Toggle (Exclusive/Inclusive) */
+    .type-group {
+      display: flex;
+      background: #eef2f7;
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 20px;
+    }
+
+    .type-option {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 8px;
+      color: #666;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .type-option.active {
+      background: #fff;
+      color: #007bff;
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    /* Quick Rate Buttons */
+    .rate-buttons {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .rate-btn {
+      padding: 8px 0;
+      background: transparent;
+      border: 1px solid #007bff;
+      color: #007bff;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.2s;
+    }
+
+    .rate-btn:hover, .rate-btn.active {
+      background-color: #007bff;
+      color: #fff;
+    }
+
+    /* Main Action Button */
+    .calculate-btn {
+      background-color: #007bff;
+      color: #fff;
+      padding: 14px 20px;
+      border: none;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 10px;
+      width: 100%;
+      transition: background 0.2s;
+    }
+
+    .calculate-btn:hover {
+      background-color: #0056b3;
+    }
+
+    /* Result Area */
+    .result-container {
+      margin-top: 25px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 15px;
+      display: none; /* Hidden by default */
+      text-align: left;
+    }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .result-row.total {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed #ccc;
+      font-weight: bold;
+      font-size: 18px;
+      color: #007bff;
+    }
+    
+    .small-note {
+      font-size: 11px;
+      color: #888;
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    @media (max-width: 500px) {
+      .container {
+        padding: 20px;
+      }
+      .rate-buttons {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>GST Calculator</h1>
+
+    <!-- Toggle: Inclusive vs Exclusive -->
+    <div class="type-group">
+      <div class="type-option active" onclick="setTaxType('exclusive')" id="btn-exclusive">GST Exclusive</div>
+      <div class="type-option" onclick="setTaxType('inclusive')" id="btn-inclusive">GST Inclusive</div>
+    </div>
+
+    <!-- Amount Input -->
+    <div class="input-group">
+      <label for="amount">Amount (₹)</label>
+      <input type="number" id="amount" placeholder="Enter Amount" oninput="calculateGST()" />
+    </div>
+
+    <!-- GST Rate Selection -->
+    <div class="input-group">
+      <label>GST Rate (%)</label>
+      <div class="rate-buttons">
+        <button class="rate-btn" onclick="selectRate(3)">3%</button>
+        <button class="rate-btn" onclick="selectRate(5)">5%</button>
+        <button class="rate-btn" onclick="selectRate(12)">12%</button>
+        <button class="rate-btn active" onclick="selectRate(18)">18%</button>
+        <button class="rate-btn" onclick="selectRate(28)">28%</button>
+      </div>
+      <!-- Custom Rate Input -->
+      <input type="number" id="customRate" placeholder="Or enter custom rate" oninput="setCustomRate()" value="18" style="margin-top: 5px;"/>
+    </div>
+
+    <button class="calculate-btn" onclick="calculateGST()">Calculate</button>
+
+    <!-- Results Display -->
+    <div class="result-container" id="resultBlock">
+      <div class="result-row">
+        <span>Net Amount:</span>
+        <span id="displayNet">₹0.00</span>
+      </div>
+      <div class="result-row">
+        <span>GST Total:</span>
+        <span id="displayGST">₹0.00</span>
+      </div>
+      <div class="result-row small-note">
+        (CGST: <span id="displayCGST">0</span> | SGST: <span id="displaySGST">0</span>)
+      </div>
+      <div class="result-row total">
+        <span>Total Amount:</span>
+        <span id="displayTotal">₹0.00</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentRate = 18;
+    let taxType = 'exclusive'; // 'exclusive' or 'inclusive'
+
+    // Function to handle Rate Button Clicks
+    function selectRate(rate) {
+      currentRate = rate;
+      document.getElementById('customRate').value = rate;
+      
+      // Update visual active state for buttons
+      document.querySelectorAll('.rate-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if(btn.textContent.includes(rate + '%')) {
+          btn.classList.add('active');
+        }
+      });
+      calculateGST();
+    }
+
+    // Function to handle Custom Input
+    function setCustomRate() {
+      const val = parseFloat(document.getElementById('customRate').value);
+      if (!isNaN(val)) {
+        currentRate = val;
+        // Remove active class from buttons if custom rate doesn't match standard
+        document.querySelectorAll('.rate-btn').forEach(btn => btn.classList.remove('active'));
+      }
+    }
+
+    // Function to handle Tax Type Toggle
+    function setTaxType(type) {
+      taxType = type;
+      document.getElementById('btn-exclusive').classList.toggle('active', type === 'exclusive');
+      document.getElementById('btn-inclusive').classList.toggle('active', type === 'inclusive');
+      calculateGST();
+    }
+
+    function calculateGST() {
+      const amountInput = document.getElementById("amount").value;
+      const resultBlock = document.getElementById("resultBlock");
+
+      if (!amountInput || amountInput < 0) {
+        resultBlock.style.display = "none";
+        return;
+      }
+
+      const amount = parseFloat(amountInput);
+      let netAmount, gstAmount, totalAmount;
+
+      if (taxType === 'exclusive') {
+        // Exclusive: Base Amount + Tax = Total
+        netAmount = amount;
+        gstAmount = (amount * currentRate) / 100;
+        totalAmount = netAmount + gstAmount;
+      } else {
+        // Inclusive: Total - Tax = Base Amount
+        // Formula: Amount = Base * (1 + Rate/100)
+        // Base = Amount / (1 + Rate/100)
+        netAmount = amount / (1 + (currentRate / 100));
+        gstAmount = amount - netAmount;
+        totalAmount = amount;
+      }
+
+      // Half GST for CGST/SGST display
+      const halfGst = gstAmount / 2;
+
+      // Update UI
+      document.getElementById("displayNet").textContent = "₹" + netAmount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      document.getElementById("displayGST").textContent = "₹" + gstAmount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      document.getElementById("displayTotal").textContent = "₹" + totalAmount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      
+      document.getElementById("displayCGST").textContent = "₹" + halfGst.toFixed(2);
+      document.getElementById("displaySGST").textContent = "₹" + halfGst.toFixed(2);
+
+      resultBlock.style.display = "block";
+    }
+  </script>
+
+</body>
+</html>
+

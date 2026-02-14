@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Base64 Converter Pro | Encode & Decode Base64 Online</title>
+    <meta name="description" content="Free online Base64 encoder and decoder. Convert text, strings, and files to/from Base64 format instantly. No data limits, works entirely in your browser.">
+    <meta name="keywords" content="base64 converter, base64 encode, base64 decode, online base64, text to base64, base64 to text, file to base64, base64 decoder, base64 encoder">
+    <meta name="author" content="Base64 Converter Pro">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Base64 Converter Pro | Encode & Decode Base64 Online">
+    <meta property="og:description" content="Free online Base64 encoder and decoder. Convert text, strings, and files to/from Base64 format instantly.">
+    <meta property="og:type" content="website">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Base64 Converter Pro",
+        "applicationCategory": "UtilityApplication",
+        "operatingSystem": "Any",
+        "description": "Online tool to encode and decode Base64 strings and files",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "featureList": [
+            "Text to Base64 encoding",
+            "Base64 to text decoding",
+            "File to Base64 conversion",
+            "Image preview for Base64 images",
+            "UTF-8 safe encoding",
+            "File download option"
+        ]
+    }
+    </script>
+    
+    <style>
+        :root {
+            --primary: #007bff;
+            --primary-dark: #0056b3;
+            --primary-light: #e3f2fd;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --border: #dee2e6;
+            --text-main: #212529;
+            --text-secondary: #6c757d;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Main App */
+        .app-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab-btn:hover {
+            background: var(--bg);
+            color: var(--primary);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .tab-btn.active:after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Input/Output Areas */
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .label-row span {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .stats {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .textarea-wrapper {
+            position: relative;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: border-color 0.3s ease;
+        }
+
+        .textarea-wrapper:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 20px;
+            font-size: 16px;
+            font-family: 'SF Mono', 'Courier New', monospace;
+            border: none;
+            outline: none;
+            resize: vertical;
+            background: transparent;
+            line-height: 1.5;
+        }
+
+        textarea::placeholder {
+            color: #adb5bd;
+        }
+
+        .textarea-footer {
+            background: var(--bg);
+            padding: 10px 20px;
+            border-top: 1px solid var(--border);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* File Upload */
+        .file-upload-area {
+            border: 3px dashed var(--border);
+            border-radius: 12px;
+            padding: 60px 30px;
+            text-align: center;
+            background: var(--bg);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .file-upload-area.drag-over {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .file-info {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: left;
+            display: none;
+        }
+
+        .file-info.show {
+            display: block;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-width: 160px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text-main);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        /* Result Area */
+        .result-section {
+            display: none;
+            margin-top: 30px;
+            animation: slideUp 0.4s ease;
+        }
+
+        .result-section.show {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .result-header h3 {
+            color: var(--text-main);
+            font-size: 1.3rem;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .result-area {
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'SF Mono', 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            line-height: 1.5;
+        }
+
+        /* Image Preview */
+        .image-preview {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .image-preview.show {
+            display: block;
+        }
+
+        .preview-img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        /* Info Section */
+        .info-section {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-top: 40px;
+        }
+
+        .info-section h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .info-card {
+            padding: 20px;
+            background: var(--bg);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .info-card h3 {
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .example-code {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'SF Mono', 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .app-card {
+                padding: 20px;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab-btn {
+                border-radius: 8px;
+                margin-bottom: 5px;
+            }
+            
+            .tab-btn.active:after {
+                display: none;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .result-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .result-actions {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .file-upload-area {
+                padding: 30px 15px;
+            }
+            
+            textarea {
+                min-height: 150px;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>Base64 Converter Pro</h1>
+            <p>Encode and decode Base64 strings and files instantly. Supports text, images, and documents. 100% free, no data limits.</p>
+        </header>
+
+        <!-- Main App -->
+        <div class="app-card">
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="text-tab">Text Converter</button>
+                <button class="tab-btn" data-tab="file-tab">File Converter</button>
+            </div>
+
+            <!-- Text Tab -->
+            <div id="text-tab" class="tab-content active">
+                <div class="input-group">
+                    <div class="label-row">
+                        <span>Input Text</span>
+                        <div class="stats">
+                            Characters: <span id="char-count">0</span> | 
+                            Size: <span id="size-info">0 bytes</span>
+                        </div>
+                    </div>
+                    <div class="textarea-wrapper">
+                        <textarea id="input-text" placeholder="Enter text to encode or paste Base64 string to decode..."></textarea>
+                        <div class="textarea-footer">
+                            <span>Supports UTF-8 encoding</span>
+                            <button class="btn-secondary" onclick="clearInput()" style="padding: 5px 15px; font-size: 14px;">
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="encodeBase64()">
+                        <span>🔒</span> Encode to Base64
+                    </button>
+                    <button class="btn btn-primary" onclick="decodeBase64()">
+                        <span>🔓</span> Decode from Base64
+                    </button>
+                    <button class="btn btn-secondary" onclick="detectAndConvert()">
+                        <span>🤖</span> Auto-detect & Convert
+                    </button>
+                </div>
+            </div>
+
+            <!-- File Tab -->
+            <div id="file-tab" class="tab-content">
+                <div class="file-upload-area" id="drop-zone">
+                    <div class="upload-icon">📁</div>
+                    <h3>Drop files here or click to upload</h3>
+                    <p>Supports images, documents, PDFs, and more (Max: 10MB)</p>
+                    <input type="file" id="file-input" hidden>
+                    <button class="btn btn-secondary" onclick="document.getElementById('file-input').click()" style="margin-top: 20px;">
+                        Choose File
+                    </button>
+                </div>
+
+                <div id="file-info" class="file-info">
+                    <div class="label-row">
+                        <span id="file-name">No file selected</span>
+                        <span id="file-size">0 KB</span>
+                    </div>
+                    <div id="file-progress"></div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="encodeFile()" id="encode-file-btn" disabled>
+                        <span>📤</span> Encode File to Base64
+                    </button>
+                    <button class="btn btn-primary" onclick="decodeToFile()" id="decode-file-btn" disabled>
+                        <span>📥</span> Decode Base64 to File
+                    </button>
+                </div>
+            </div>
+
+            <!-- Result Section -->
+            <div id="result-section" class="result-section">
+                <div class="result-header">
+                    <h3 id="result-title">Result</h3>
+                    <div class="result-actions">
+                        <button class="btn btn-success" onclick="copyResult()">
+                            <span>📋</span> Copy
+                        </button>
+                        <button class="btn btn-secondary" onclick="downloadResult()">
+                            <span>⬇️</span> Download
+                        </button>
+                    </div>
+                </div>
+                <div id="result-area" class="result-area">
+                    Your result will appear here...
+                </div>
+                
+                <!-- Image Preview for Base64 Images -->
+                <div id="image-preview" class="image-preview">
+                    <h4>Image Preview</h4>
+                    <img id="preview-img" class="preview-img" src="" alt="Base64 Image Preview">
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Section -->
+        <div class="info-section">
+            <h2>About Base64 Encoding</h2>
+            <p>Base64 is a binary-to-text encoding scheme that represents binary data in an ASCII string format. It's commonly used to embed binary data in text-based formats like HTML, CSS, and JSON.</p>
+            
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>Common Uses</h3>
+                    <ul>
+                        <li>Embed images in HTML/CSS without separate files</li>
+                        <li>Encode file attachments in emails</li>
+                        <li>Store binary data in databases as text</li>
+                        <li>API data transfer for binary content</li>
+                        <li>Data URLs for web resources</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card">
+                    <h3>How It Works</h3>
+                    <p>Base64 converts every 3 bytes (24 bits) of binary data into 4 ASCII characters from a set of 64 characters (A-Z, a-z, 0-9, +, /).</p>
+                    <div class="example-code">
+                        Text: "Hello" → Base64: "SGVsbG8="
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Features</h3>
+                    <ul>
+                        <li>UTF-8 safe encoding/decoding</li>
+                        <li>File to Base64 conversion</li>
+                        <li>Image preview for Base64 images</li>
+                        <li>No data size limits</li>
+                        <li>Works entirely in your browser</li>
+                        <li>No data uploaded to servers</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <h3 style="margin-top: 30px;">Quick Examples</h3>
+            <div class="example-code">
+// Text to Base64
+Input: "Hello World!"
+Output: "SGVsbG8gV29ybGQh"
+
+// Base64 to Text
+Input: "SGVsbG8gV29ybGQh"
+Output: "Hello World!"
+
+// Image to Base64 (Data URL)
+data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer style="text-align: center; margin-top: 40px; padding: 20px; color: var(--text-secondary); font-size: 0.9rem;">
+            <p>© 2024 Base64 Converter Pro | Free Online Tool | 
+                <a href="#privacy" style="color: var(--primary); text-decoration: none;">Privacy</a> | 
+                <a href="#terms" style="color: var(--primary); text-decoration: none;">Terms</a> | 
+                <a href="#contact" style="color: var(--primary); text-decoration: none;">Contact</a>
+            </p>
+            <p style="margin-top: 10px; font-size: 0.8rem;">All conversions happen locally in your browser. No data is sent to any server.</p>
+        </footer>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // DOM Elements
+        const inputText = document.getElementById('input-text');
+        const charCount = document.getElementById('char-count');
+        const sizeInfo = document.getElementById('size-info');
+        const resultArea = document.getElementById('result-area');
+        const resultSection = document.getElementById('result-section');
+        const resultTitle = document.getElementById('result-title');
+        const toast = document.getElementById('toast');
+        const fileInput = document.getElementById('file-input');
+        const fileInfo = document.getElementById('file-info');
+        const fileName = document.getElementById('file-name');
+        const fileSize = document.getElementById('file-size');
+        const dropZone = document.getElementById('drop-zone');
+        const encodeFileBtn = document.getElementById('encode-file-btn');
+        const decodeFileBtn = document.getElementById('decode-file-btn');
+        const imagePreview = document.getElementById('image-preview');
+        const previewImg = document.getElementById('preview-img');
+        
+        let currentFile = null;
+        let currentResult = '';
+
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.add('active');
+                
+                // Clear result when switching tabs
+                resultSection.classList.remove('show');
+                imagePreview.classList.remove('show');
+            });
+        });
+
+        // Update character count
+        inputText.addEventListener('input', () => {
+            const text = inputText.value;
+            const charLength = text.length;
+            const byteSize = new Blob([text]).size;
+            
+            charCount.textContent = charLength;
+            sizeInfo.textContent = formatBytes(byteSize);
+        });
+
+        // UTF-8 safe Base64 encoding
+        function encodeBase64() {
+            const text = inputText.value.trim();
+            if (!text) {
+                showToast('Please enter some text first!', 'warning');
+                return;
+            }
+
+            try {
+                // Encode with UTF-8 support
+                const encoded = btoa(unescape(encodeURIComponent(text)));
+                showResult(encoded, 'Base64 Encoded Text');
+                showToast('Text encoded successfully!');
+            } catch (error) {
+                showToast('Error encoding text!', 'error');
+            }
+        }
+
+        // UTF-8 safe Base64 decoding
+        function decodeBase64() {
+            const text = inputText.value.trim();
+            if (!text) {
+                showToast('Please enter Base64 text!', 'warning');
+                return;
+            }
+
+            try {
+                // Clean the input (remove data:image/... prefix if present)
+                let cleanText = text;
+                if (text.includes('base64,')) {
+                    cleanText = text.split('base64,')[1];
+                }
+                
+                // Decode with UTF-8 support
+                const decoded = decodeURIComponent(escape(atob(cleanText)));
+                showResult(decoded, 'Decoded Text');
+                
+                // Check if it's a Base64 image and show preview
+                if (text.startsWith('data:image/')) {
+                    previewImg.src = text;
+                    imagePreview.classList.add('show');
+                } else {
+                    imagePreview.classList.remove('show');
+                }
+                
+                showToast('Text decoded successfully!');
+            } catch (error) {
+                showToast('Invalid Base64 format!', 'error');
+            }
+        }
+
+        // Auto-detect and convert
+        function detectAndConvert() {
+            const text = inputText.value.trim();
+            if (!text) {
+                showToast('Please enter text!', 'warning');
+                return;
+            }
+
+            // Check if it looks like Base64
+            const isBase64 = /^[A-Za-z0-9+/=]+$/.test(text) || text.includes('base64,');
+            
+            if (isBase64) {
+                decodeBase64();
+            } else {
+                encodeBase64();
+            }
+        }
+
+        // File handling
+        fileInput.addEventListener('change', handleFileSelect);
+        
+        // Drag and drop
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('drag-over');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            
+            if (e.dataTransfer.files.length) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        function handleFileSelect(e) {
+            if (e.target.files.length) {
+                handleFile(e.target.files[0]);
+            }
+        }
+
+        function handleFile(file) {
+            if (file.size > 10 * 1024 * 1024) { // 10MB limit
+                showToast('File too large! Maximum size is 10MB.', 'error');
+                return;
+            }
+
+            currentFile = file;
+            fileName.textContent = file.name;
+            fileSize.textContent = formatBytes(file.size);
+            fileInfo.classList.add('show');
+            
+            // Enable buttons
+            encodeFileBtn.disabled = false;
+            decodeFileBtn.disabled = false;
+            
+            showToast(`File "${file.name}" loaded successfully!`);
+        }
+
+        // Encode file to Base64
+        function encodeFile() {
+            if (!currentFile) {
+                showToast('Please select a file first!', 'warning');
+                return;
+            }
+
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const base64 = e.target.result;
+                showResult(base64, 'Base64 Encoded File');
+                
+                // Check if it's an image and show preview
+                if (currentFile.type.startsWith('image/')) {
+                    previewImg.src = base64;
+                    imagePreview.classList.add('show');
+                } else {
+                    imagePreview.classList.remove('show');
+                }
+                
+                showToast('File encoded to Base64 successfully!');
+            };
+            
+            reader.onerror = function() {
+                showToast('Error reading file!', 'error');
+            };
+            
+            reader.readAsDataURL(currentFile);
+        }
+
+        // Decode Base64 to file
+        function decodeToFile() {
+            const base64Text = inputText.value.trim();
+            if (!base64Text && !currentResult.includes('base64,')) {
+                showToast('Please enter Base64 text or encode a file first!', 'warning');
+                return;
+            }
+
+            try {
+                const textToDecode = base64Text || currentResult;
+                let base64Data = textToDecode;
+                
+                // Extract pure Base64 if it's a data URL
+                if (textToDecode.includes('base64,')) {
+                    base64Data = textToDecode.split('base64,')[1];
+                }
+                
+                // Convert Base64 to binary
+                const binaryString = atob(base64Data);
+                const bytes = new Uint8Array(binaryString.length);
+                
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                
+                const blob = new Blob([bytes], { type: 'application/octet-stream' });
+                const url = URL.createObjectURL(blob);
+                
+                // Create download link
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'decoded_file.bin';
+                
+                // Detect file type for better naming
+                if (textToDecode.startsWith('data:')) {
+                    const match = textToDecode.match(/^data:(.+?);/);
+                    if (match) {
+                        const mimeType = match[1];
+                        const ext = mimeType.split('/')[1] || 'bin';
+                        a.download = `decoded_file.${ext}`;
+                    }
+                }
+                
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                showToast('File downloaded successfully!');
+            } catch (error) {
+                showToast('Invalid Base64 format for file conversion!', 'error');
+            }
+        }
+
+        // Show result
+        function showResult(text, title) {
+            currentResult = text;
+            resultArea.textContent = text;
+            resultTitle.textContent = title;
+            resultSection.classList.add('show');
+            
+            // Scroll to result
+            resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Copy result to clipboard
+        function copyResult() {
+            if (!currentResult) {
+                showToast('No result to copy!', 'warning');
+                return;
+            }
+
+            navigator.clipboard.writeText(currentResult).then(() => {
+                showToast('Copied to clipboard! ✓');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = currentResult;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showToast('Copied to clipboard! ✓');
+            });
+        }
+
+        // Download result
+        function downloadResult() {
+            if (!currentResult) {
+                showToast('No result to download!', 'warning');
+                return;
+            }
+
+            const blob = new Blob([currentResult], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'base64_result.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showToast('Result downloaded!');
+        }
+
+        // Clear input
+        function clearInput() {
+            inputText.value = '';
+            inputText.dispatchEvent(new Event('input'));
+            showToast('Input cleared!');
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            toast.textContent = message;
+            toast.className = 'toast';
+            
+            // Add type class
+            if (type === 'error') {
+                toast.style.background = 'rgba(220, 53, 69, 0.9)';
+            } else if (type === 'warning') {
+                toast.style.background = 'rgba(255, 193, 7, 0.9)';
+            } else {
+                toast.style.background = 'rgba(40, 167, 69, 0.9)';
+            }
+            
+            toast.classList.add('show');
+            
+            // Auto-hide
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Format bytes to human readable
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+            
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+
+        // Load example on first visit
+        window.addEventListener('load', () => {
+            if (!inputText.value.trim()) {
+                inputText.value = 'Hello World! This is a Base64 example.';
+                inputText.dispatchEvent(new Event('input'));
+                showToast('Try encoding this example text!', 'info');
+            }
+        });
+    </script>
+    <script async="async" data-cfasync="false" src="https://pl28699215.effectivegatecpm.com/6638ee3f7ef875c60276d1e326e6d7e3/invoke.js"></script>
+<div id="container-6638ee3f7ef875c60276d1e326e6d7e3"></div>
+</body>
+  </html>

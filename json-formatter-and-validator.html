@@ -1,0 +1,250 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pro JSON Formatter & Validator</title>
+  <style>
+    /* Professional Blue & White Theme */
+    :root {
+      --primary: #007bff;
+      --primary-hover: #0056b3;
+      --bg: #f0f8ff;
+      --card-bg: #ffffff;
+      --border: #d1d9e0;
+      --error: #dc3545;
+      --success: #28a745;
+      --json-key: #a626a4;
+      --json-string: #50a14f;
+      --json-num: #986801;
+    }
+
+    body {
+      font-family: 'SF Mono', 'Fira Code', 'Segoe UI', sans-serif;
+      background: var(--bg);
+      margin: 0;
+      padding: 30px 15px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app-container {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 850px;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0, 123, 255, 0.1);
+    }
+
+    h2 {
+      color: var(--primary);
+      text-align: center;
+      margin-top: 0;
+      font-weight: 700;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    #textBox {
+      width: 100%;
+      min-height: 200px;
+      padding: 15px;
+      font-size: 14px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+      box-sizing: border-box;
+      background: #fff;
+      white-space: pre;
+      overflow: auto;
+      transition: border-color 0.3s;
+    }
+
+    #textBox:focus {
+      border-color: var(--primary);
+    }
+
+    #textBox:empty:before {
+      content: attr(placeholder);
+      color: #adb5bd;
+    }
+
+    .main-actions {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    button {
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn-primary { background: var(--primary); color: white; flex: 2; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    
+    .btn-outline { background: #f8f9fa; border: 1px solid var(--border); color: #444; flex: 1; }
+    .btn-outline:hover { background: #eee; }
+
+    /* Result Panels */
+    .status-panel {
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      display: none;
+      font-size: 14px;
+    }
+
+    .status-error { background: #fff5f5; border: 1px solid var(--error); color: var(--error); display: block; }
+    .status-success { background: #f6fff6; border: 1px solid var(--success); color: var(--success); display: block; }
+
+    .output-header {
+      background: #333;
+      padding: 8px 15px;
+      border-radius: 8px 8px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #output {
+      width: 100%;
+      max-height: 400px;
+      padding: 15px;
+      background: #fafafa;
+      border: 1px solid #ddd;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      font-size: 13px;
+      overflow: auto;
+      white-space: pre;
+      box-sizing: border-box;
+    }
+
+    /* JSON Highlighting */
+    .json-key { color: var(--json-key); font-weight: bold; }
+    .json-string { color: var(--json-string); }
+    .json-number { color: var(--json-num); }
+    .json-boolean { color: #c678dd; }
+    .json-null { color: #abb2bf; }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <h2>JSON Pro Console</h2>
+
+  <div class="toolbar">
+    <span style="font-size: 13px; color: #666; font-weight: bold;">Input JSON Data</span>
+    <button class="btn-outline" style="padding: 5px 10px; font-size: 12px; flex: none;" onclick="pasteJSON()">Paste</button>
+  </div>
+  
+  <div id="textBox" contenteditable="true" placeholder='{"example": "paste json here"}'></div>
+
+  <div class="main-actions">
+    <button class="btn-primary" onclick="handleJSON('format')">Format & Validate</button>
+    <button class="btn-outline" onclick="handleJSON('minify')">Minify</button>
+    <button class="btn-outline" style="flex: 0.5;" onclick="clearAll()">Clear</button>
+  </div>
+
+  <div id="statusBox" class="status-panel"></div>
+
+  <div id="resultArea" style="display:none;">
+    <div class="output-header">
+      <span style="color:#aaa; font-size:11px; font-weight:bold;">PREVIEW</span>
+      <button class="btn-outline" style="padding: 4px 8px; font-size: 11px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.3);" onclick="copyOutput()">Copy Result</button>
+    </div>
+    <div id="output"></div>
+  </div>
+</div>
+
+<script>
+  async function pasteJSON() {
+    try {
+      const text = await navigator.clipboard.readText();
+      document.getElementById("textBox").innerText = text;
+    } catch (err) {
+      alert("Please use Ctrl+V to paste.");
+    }
+  }
+
+  function syntaxHighlight(json) {
+    if (typeof json != 'string') {
+      json = JSON.stringify(json, undefined, 2);
+    }
+    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g, function (match) {
+      var cls = 'json-number';
+      if (/^"/.test(match)) {
+        if (/:$/.test(match)) {
+          cls = 'json-key';
+        } else {
+          cls = 'json-string';
+        }
+      } else if (/true|false/.test(match)) {
+        cls = 'json-boolean';
+      } else if (/null/.test(match)) {
+        cls = 'json-null';
+      }
+      return '<span class="' + cls + '">' + match + '</span>';
+    });
+  }
+
+  function handleJSON(mode) {
+    const input = document.getElementById("textBox").innerText.trim();
+    const statusBox = document.getElementById("statusBox");
+    const resultArea = document.getElementById("resultArea");
+    const output = document.getElementById("output");
+
+    if (!input) return;
+
+    try {
+      const obj = JSON.parse(input);
+      const resultString = mode === 'format' ? JSON.stringify(obj, null, 2) : JSON.stringify(obj);
+      
+      statusBox.innerText = "✓ Valid JSON Configuration";
+      statusBox.className = "status-panel status-success";
+      
+      output.innerHTML = syntaxHighlight(resultString);
+      resultArea.style.display = "block";
+    } catch (e) {
+      statusBox.innerText = "✕ Invalid JSON: " + e.message;
+      statusBox.className = "status-panel status-error";
+      resultArea.style.display = "none";
+    }
+  }
+
+  function clearAll() {
+    document.getElementById("textBox").innerText = "";
+    document.getElementById("resultArea").style.display = "none";
+    document.getElementById("statusBox").style.display = "none";
+  }
+
+  function copyOutput() {
+    const text = document.getElementById("output").innerText;
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+    alert("Copied to clipboard!");
+  }
+</script>
+
+</body>
+</html>

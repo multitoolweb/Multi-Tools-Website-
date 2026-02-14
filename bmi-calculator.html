@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>BMI Health Dashboard</title>
+  <style>
+    :root {
+      --primary: #007bff;
+      --bg: #f0f4f8;
+      --underweight: #17a2b8;
+      --normal: #28a745;
+      --overweight: #ffc107;
+      --obese: #dc3545;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 15px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 30px;
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      width: 100%;
+      max-width: 450px;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      color: var(--primary);
+      margin: 0 0 10px 0;
+      font-size: 24px;
+      text-align: center;
+    }
+
+    .unit-switch {
+      display: flex;
+      background: #eee;
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+    }
+
+    .unit-switch button {
+      flex: 1;
+      border: none;
+      padding: 8px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      background: transparent;
+      color: #666;
+      transition: 0.2s;
+    }
+
+    .unit-switch button.active {
+      background: #fff;
+      color: var(--primary);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      text-align: left;
+    }
+
+    .input-group {
+      flex: 1;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: #888;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: 2px solid #edf2f7;
+      border-radius: 12px;
+      box-sizing: border-box;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus { border-color: var(--primary); }
+
+    .calc-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      width: 100%;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: 700;
+      border-radius: 14px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .calc-btn:active { transform: scale(0.98); }
+
+    /* Results Dashboard */
+    #resultArea {
+      margin-top: 30px;
+      display: none;
+      animation: slideUp 0.4s ease-out;
+    }
+
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } }
+
+    .bmi-value {
+      font-size: 48px;
+      font-weight: 800;
+      margin: 10px 0;
+    }
+
+    .bmi-category {
+      font-size: 18px;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: 50px;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+
+    .gauge {
+      height: 10px;
+      background: #eee;
+      border-radius: 5px;
+      display: flex;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+
+    .gauge-part { height: 100%; }
+
+    .info-card {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 12px;
+      font-size: 14px;
+      color: #555;
+      line-height: 1.5;
+    }
+
+    .info-card strong { color: #333; }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>BMI Dashboard</h1>
+    
+    <div class="unit-switch">
+      <button id="metricTab" class="active" onclick="setUnits('metric')">Metric</button>
+      <button id="imperialTab" onclick="setUnits('imperial')">Imperial</button>
+    </div>
+
+    <!-- Metric Inputs -->
+    <div id="metricInputs">
+      <div class="input-row">
+        <div class="input-group">
+          <label>Weight (kg)</label>
+          <input type="number" id="w-kg" placeholder="70" />
+        </div>
+        <div class="input-group">
+          <label>Height (cm)</label>
+          <input type="number" id="h-cm" placeholder="175" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Imperial Inputs -->
+    <div id="imperialInputs" class="hidden">
+      <div class="input-row">
+        <div class="input-group">
+          <label>Weight (lbs)</label>
+          <input type="number" id="w-lb" placeholder="154" />
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label>Feet</label>
+          <input type="number" id="h-ft" placeholder="5" />
+        </div>
+        <div class="input-group">
+          <label>Inches</label>
+          <input type="number" id="h-in" placeholder="9" />
+        </div>
+      </div>
+    </div>
+
+    <button class="calc-btn" onclick="calculateBMI()">Analyze Composition</button>
+
+    <div id="resultArea">
+      <div class="bmi-value" id="resBMI">24.5</div>
+      <div class="bmi-category" id="resCat">Normal Weight</div>
+      
+      <div class="gauge">
+        <div class="gauge-part" style="width: 18.5%; background: var(--underweight);"></div>
+        <div class="gauge-part" style="width: 6.5%; background: var(--normal);"></div>
+        <div class="gauge-part" style="width: 5%; background: var(--overweight);"></div>
+        <div class="gauge-part" style="width: 70%; background: var(--obese);"></div>
+      </div>
+
+      <div class="info-card">
+        Your ideal weight range for this height is:<br>
+        <strong id="idealWeight">62kg - 76kg</strong>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentUnit = 'metric';
+
+    function setUnits(unit) {
+      currentUnit = unit;
+      document.getElementById('metricTab').classList.toggle('active', unit === 'metric');
+      document.getElementById('imperialTab').classList.toggle('active', unit === 'imperial');
+      document.getElementById('metricInputs').classList.toggle('hidden', unit !== 'metric');
+      document.getElementById('imperialInputs').classList.toggle('hidden', unit !== 'imperial');
+      document.getElementById('resultArea').style.display = 'none';
+    }
+
+    function calculateBMI() {
+      let weight, heightM;
+      let weightDisplay, weightUnit;
+
+      if (currentUnit === 'metric') {
+        weight = parseFloat(document.getElementById('w-kg').value);
+        let heightCm = parseFloat(document.getElementById('h-cm').value);
+        heightM = heightCm / 100;
+        weightUnit = "kg";
+      } else {
+        let lbs = parseFloat(document.getElementById('w-lb').value);
+        let ft = parseFloat(document.getElementById('h-ft').value) || 0;
+        let inch = parseFloat(document.getElementById('h-in').value) || 0;
+        weight = lbs * 0.453592;
+        heightM = ((ft * 12) + inch) * 0.0254;
+        weightUnit = "lbs";
+      }
+
+      if (!weight || !heightM || weight <= 0 || heightM <= 0) {
+        alert("Please enter valid measurements.");
+        return;
+      }
+
+      const bmi = weight / (heightM * heightM);
+      const resBMI = document.getElementById('resBMI');
+      const resCat = document.getElementById('resCat');
+      const idealWeight = document.getElementById('idealWeight');
+
+      resBMI.textContent = bmi.toFixed(1);
+      
+      let color = "";
+      let cat = "";
+
+      if (bmi < 18.5) { cat = "Underweight"; color = "var(--underweight)"; }
+      else if (bmi < 25) { cat = "Healthy Weight"; color = "var(--normal)"; }
+      else if (bmi < 30) { cat = "Overweight"; color = "var(--overweight)"; }
+      else { cat = "Obesity"; color = "var(--obese)"; }
+
+      resCat.textContent = cat;
+      resCat.style.backgroundColor = color;
+      resCat.style.color = (cat === "Overweight") ? "#333" : "#fff";
+      resBMI.style.color = color;
+
+      // Ideal weight range calculation (BMI 18.5 to 25)
+      let minW = 18.5 * (heightM * heightM);
+      let maxW = 25 * (heightM * heightM);
+
+      if (currentUnit === 'metric') {
+        idealWeight.textContent = `${minW.toFixed(1)}kg - ${maxW.toFixed(1)}kg`;
+      } else {
+        idealWeight.textContent = `${(minW * 2.204).toFixed(1)}lbs - ${(maxW * 2.204).toFixed(1)}lbs`;
+      }
+
+      document.getElementById('resultArea').style.display = 'block';
+    }
+  </script>
+  <script async="async" data-cfasync="false" src="https://pl28699215.effectivegatecpm.com/6638ee3f7ef875c60276d1e326e6d7e3/invoke.js"></script>
+<div id="container-6638ee3f7ef875c60276d1e326e6d7e3"></div>
+</body>
+</html>

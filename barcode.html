@@ -1,0 +1,523 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Barcode Generator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- JsBarcode Library -->
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none; 
+            background: transparent; 
+        }
+        
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #2563eb;
+            cursor: pointer;
+            margin-top: -6px; 
+            box-shadow: 0 0 0 2px #fff, 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #dbeafe;
+            border-radius: 2px;
+        }
+
+        input[type=range]:focus::-webkit-slider-thumb {
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px rgba(37, 99, 235, 0.3);
+        }
+        
+        /* Smooth fade for error messages */
+        .fade-in {
+            animation: fadeIn 0.2s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-brand-50 min-h-screen text-slate-800 flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-blue-100 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white shadow-brand-500/20 shadow-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                </div>
+                <h1 class="text-xl font-bold tracking-tight text-slate-900">Barcode<span class="text-brand-600">Pro</span></h1>
+            </div>
+            <a href="#" class="text-sm font-medium text-slate-500 hover:text-brand-600 transition-colors">More Tools</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow p-4 md:p-8">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+            
+            <!-- Left Column: Controls -->
+            <div class="lg:col-span-5 space-y-6">
+                
+                <!-- Input Card -->
+                <div class="bg-white rounded-2xl shadow-sm border border-blue-100 overflow-hidden">
+                    <div class="p-5 border-b border-blue-50 bg-blue-50/50">
+                        <h2 class="text-sm font-semibold uppercase tracking-wider text-brand-700">1. Data & Format</h2>
+                    </div>
+                    <div class="p-6 space-y-5">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Barcode Content</label>
+                            <div class="relative">
+                                <input type="text" id="barcodeValue" 
+                                    class="w-full pl-4 pr-10 py-3 rounded-xl border border-blue-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition-all font-mono text-slate-700"
+                                    placeholder="Enter text or numbers" value="12345678">
+                                <div id="inputStatus" class="absolute right-3 top-3.5 text-green-500">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                </div>
+                            </div>
+                            <p id="errorMsg" class="text-xs text-red-500 mt-2 hidden fade-in font-medium">Invalid characters for this format.</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Barcode Type</label>
+                            <div class="relative">
+                                <select id="barcodeFormat" class="w-full pl-4 pr-10 py-3 rounded-xl border border-blue-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition-all bg-white appearance-none cursor-pointer">
+                                    <optgroup label="Popular">
+                                        <option value="CODE128" selected>Code 128 (Auto)</option>
+                                        <option value="EAN13">EAN-13 (Retail)</option>
+                                        <option value="UPC">UPC-A (US Retail)</option>
+                                        <option value="QR" disabled>QR Code (Use QR Tool)</option>
+                                    </optgroup>
+                                    <optgroup label="Industrial">
+                                        <option value="CODE39">Code 39</option>
+                                        <option value="ITF14">ITF-14</option>
+                                        <option value="MSI">MSI / Plessey</option>
+                                        <option value="pharmacode">Pharmacode</option>
+                                    </optgroup>
+                                </select>
+                                <div class="absolute right-4 top-3.5 pointer-events-none text-slate-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customization Card -->
+                <div class="bg-white rounded-2xl shadow-sm border border-blue-100 overflow-hidden">
+                    <div class="p-5 border-b border-blue-50 bg-blue-50/50 flex justify-between items-center">
+                        <h2 class="text-sm font-semibold uppercase tracking-wider text-brand-700">2. Customization</h2>
+                        <button id="resetBtn" class="text-xs text-slate-400 hover:text-brand-600 font-medium underline">Reset Defaults</button>
+                    </div>
+                    <div class="p-6 space-y-6">
+                        
+                        <!-- Colors -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 mb-2">BAR COLOR</label>
+                                <div class="flex items-center gap-2 p-2 border border-blue-100 rounded-lg bg-blue-50/30">
+                                    <input type="color" id="lineColor" value="#000000" class="w-8 h-8 rounded border-none cursor-pointer bg-transparent">
+                                    <span class="text-xs font-mono text-slate-600" id="lineColorHex">#000000</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 mb-2">BACKGROUND</label>
+                                <div class="flex items-center gap-2 p-2 border border-blue-100 rounded-lg bg-blue-50/30">
+                                    <input type="color" id="bgColor" value="#ffffff" class="w-8 h-8 rounded border-none cursor-pointer bg-transparent">
+                                    <span class="text-xs font-mono text-slate-600" id="bgColorHex">#FFFFFF</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sliders -->
+                        <div class="space-y-5">
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <label class="text-xs font-semibold text-slate-500">BAR WIDTH</label>
+                                    <span class="text-xs font-mono bg-blue-100 text-brand-700 px-1.5 py-0.5 rounded" id="widthVal">2px</span>
+                                </div>
+                                <input type="range" id="barWidth" min="1" max="4" value="2" class="w-full">
+                            </div>
+                            
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <label class="text-xs font-semibold text-slate-500">HEIGHT</label>
+                                    <span class="text-xs font-mono bg-blue-100 text-brand-700 px-1.5 py-0.5 rounded" id="heightVal">100px</span>
+                                </div>
+                                <input type="range" id="barHeight" min="30" max="150" value="100" class="w-full">
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <label class="text-xs font-semibold text-slate-500">FONT SIZE</label>
+                                    <span class="text-xs font-mono bg-blue-100 text-brand-700 px-1.5 py-0.5 rounded" id="fontSizeVal">20px</span>
+                                </div>
+                                <input type="range" id="fontSize" min="10" max="30" value="20" class="w-full">
+                            </div>
+                        </div>
+
+                        <!-- Toggles -->
+                        <div class="flex items-center justify-between pt-2">
+                            <label class="flex items-center gap-3 cursor-pointer">
+                                <div class="relative">
+                                    <input type="checkbox" id="displayValue" class="sr-only peer" checked>
+                                    <div class="w-10 h-6 bg-slate-200 rounded-full peer peer-checked:bg-brand-600 transition-colors"></div>
+                                    <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-4"></div>
+                                </div>
+                                <span class="text-sm font-medium text-slate-700">Show Text</span>
+                            </label>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Preview & Download -->
+            <div class="lg:col-span-7 flex flex-col gap-6 sticky top-24">
+                
+                <!-- Preview Card -->
+                <div class="bg-white rounded-2xl shadow-lg shadow-brand-100/50 border border-blue-100 overflow-hidden flex flex-col min-h-[400px]">
+                    <div class="p-5 border-b border-blue-50 flex justify-between items-center">
+                        <h2 class="text-sm font-semibold uppercase tracking-wider text-brand-700">Live Preview</h2>
+                        <span id="badgeFormat" class="text-xs font-bold px-2.5 py-1 bg-brand-100 text-brand-700 rounded-md">CODE128</span>
+                    </div>
+
+                    <!-- Canvas Container -->
+                    <div class="flex-grow bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M1%201h2v2H1V1zm4%200h2v2H5V1zm4%200h2v2H9V1zM1%205h2v2H1V5zm4%200h2v2H5V5zm4%200h2v2H9V5zM1%209h2v2H1V9zm4%200h2v2H5V9zm4%200h2v2H9V9z%22%20fill%3D%22%23f1f5f9%22%20fill-opacity%3D%220.4%22%2F%3E%3C%2Fsvg%3E')] flex items-center justify-center p-8 overflow-auto">
+                        <div class="relative group">
+                            <!-- The SVG Barcode -->
+                            <svg id="barcodeSvg" class="max-w-full shadow-xl rounded-lg transition-transform duration-300"></svg>
+                            
+                            <!-- Invalid State Overlay -->
+                            <div id="invalidOverlay" class="absolute inset-0 backdrop-blur-sm bg-white/80 z-10 hidden flex-col items-center justify-center rounded-lg border-2 border-red-100">
+                                <div class="w-12 h-12 bg-red-100 text-red-500 rounded-full flex items-center justify-center mb-3">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                </div>
+                                <span class="text-sm font-semibold text-red-600">Invalid Data</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Download Actions -->
+                    <div class="p-6 bg-white border-t border-blue-50">
+                        <div class="flex flex-col sm:flex-row items-end sm:items-center gap-4 justify-between">
+                            <div class="w-full sm:w-auto">
+                                <label class="block text-xs font-semibold text-slate-500 mb-1.5">QUALITY / SCALE</label>
+                                <select id="downloadScale" class="w-full sm:w-32 py-2 px-3 rounded-lg border border-blue-200 text-sm focus:border-brand-500 focus:ring-1 focus:ring-brand-500 bg-white">
+                                    <option value="1">1x (Standard)</option>
+                                    <option value="2">2x (High)</option>
+                                    <option value="4" selected>4x (Print)</option>
+                                </select>
+                            </div>
+
+                            <div class="flex gap-3 w-full sm:w-auto">
+                                <button onclick="downloadFormat('svg')" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-blue-200 hover:bg-blue-50 text-slate-700 font-medium transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                    SVG
+                                </button>
+                                <button onclick="downloadFormat('png')" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-medium shadow-lg shadow-brand-500/20 transition-all hover:translate-y-[-1px]">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    Download PNG
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Text -->
+                <p class="text-center text-slate-400 text-sm">
+                    Generated barcodes are processed locally in your browser. <br>
+                    <span class="text-slate-300">Privacy secure. No server uploads.</span>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Hidden Canvas for Export -->
+    <canvas id="exportCanvas" class="hidden"></canvas>
+
+    <script>
+        // --- Configuration & State ---
+        const defaults = {
+            value: "12345678",
+            format: "CODE128",
+            width: 2,
+            height: 100,
+            displayValue: true,
+            fontSize: 20,
+            lineColor: "#000000",
+            background: "#ffffff",
+            margin: 10
+        };
+
+        let currentState = { ...defaults };
+
+        // --- DOM Elements ---
+        const ui = {
+            input: document.getElementById('barcodeValue'),
+            format: document.getElementById('barcodeFormat'),
+            svg: document.getElementById('barcodeSvg'),
+            statusIcon: document.getElementById('inputStatus'),
+            errorMsg: document.getElementById('errorMsg'),
+            badge: document.getElementById('badgeFormat'),
+            invalidOverlay: document.getElementById('invalidOverlay'),
+            
+            // Customization Inputs
+            lineColor: document.getElementById('lineColor'),
+            bgColor: document.getElementById('bgColor'),
+            lineColorHex: document.getElementById('lineColorHex'),
+            bgColorHex: document.getElementById('bgColorHex'),
+            
+            barWidth: document.getElementById('barWidth'),
+            barHeight: document.getElementById('barHeight'),
+            fontSize: document.getElementById('fontSize'),
+            displayValue: document.getElementById('displayValue'),
+            
+            // Value Labels
+            widthVal: document.getElementById('widthVal'),
+            heightVal: document.getElementById('heightVal'),
+            fontSizeVal: document.getElementById('fontSizeVal'),
+            
+            // Reset
+            resetBtn: document.getElementById('resetBtn'),
+            
+            // Download
+            downloadScale: document.getElementById('downloadScale')
+        };
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            attachListeners();
+            updateBarcode();
+        });
+
+        function attachListeners() {
+            // Main Inputs
+            ui.input.addEventListener('input', debounce(() => {
+                currentState.value = ui.input.value;
+                updateBarcode();
+            }, 300));
+
+            ui.format.addEventListener('change', (e) => {
+                currentState.format = e.target.value;
+                updateBarcode();
+            });
+
+            // Color Pickers
+            ui.lineColor.addEventListener('input', (e) => {
+                currentState.lineColor = e.target.value;
+                ui.lineColorHex.textContent = e.target.value.toUpperCase();
+                updateBarcode();
+            });
+
+            ui.bgColor.addEventListener('input', (e) => {
+                currentState.background = e.target.value;
+                ui.bgColorHex.textContent = e.target.value.toUpperCase();
+                updateBarcode();
+            });
+
+            // Range Sliders
+            ui.barWidth.addEventListener('input', (e) => {
+                currentState.width = parseInt(e.target.value);
+                ui.widthVal.textContent = e.target.value + 'px';
+                updateBarcode();
+            });
+
+            ui.barHeight.addEventListener('input', (e) => {
+                currentState.height = parseInt(e.target.value);
+                ui.heightVal.textContent = e.target.value + 'px';
+                updateBarcode();
+            });
+
+            ui.fontSize.addEventListener('input', (e) => {
+                currentState.fontSize = parseInt(e.target.value);
+                ui.fontSizeVal.textContent = e.target.value + 'px';
+                updateBarcode();
+            });
+
+            // Checkbox
+            ui.displayValue.addEventListener('change', (e) => {
+                currentState.displayValue = e.target.checked;
+                updateBarcode();
+            });
+
+            // Reset
+            ui.resetBtn.addEventListener('click', () => {
+                currentState = { ...defaults };
+                // Update UI elements to match defaults
+                ui.input.value = defaults.value;
+                ui.format.value = defaults.format;
+                ui.lineColor.value = defaults.lineColor;
+                ui.bgColor.value = defaults.background;
+                ui.barWidth.value = defaults.width;
+                ui.barHeight.value = defaults.height;
+                ui.fontSize.value = defaults.fontSize;
+                ui.displayValue.checked = defaults.displayValue;
+                
+                // Update Labels
+                ui.widthVal.textContent = defaults.width + 'px';
+                ui.heightVal.textContent = defaults.height + 'px';
+                ui.fontSizeVal.textContent = defaults.fontSize + 'px';
+                ui.lineColorHex.textContent = defaults.lineColor.toUpperCase();
+                ui.bgColorHex.textContent = defaults.background.toUpperCase();
+                
+                updateBarcode();
+            });
+        }
+
+        // --- Core Logic ---
+        function updateBarcode() {
+            // Update Badge
+            ui.badge.textContent = currentState.format;
+            
+            // Validation & Rendering
+            try {
+                if (!currentState.value.trim()) throw new Error("Empty");
+
+                JsBarcode("#barcodeSvg", currentState.value, {
+                    format: currentState.format,
+                    lineColor: currentState.lineColor,
+                    background: currentState.background,
+                    width: currentState.width,
+                    height: currentState.height,
+                    displayValue: currentState.displayValue,
+                    fontSize: currentState.fontSize,
+                    font: "Outfit",
+                    margin: currentState.margin,
+                    fontOptions: "bold"
+                });
+
+                setValidState(true);
+
+            } catch (error) {
+                setValidState(false);
+            }
+        }
+
+        function setValidState(isValid) {
+            if (isValid) {
+                ui.input.classList.remove('border-red-300', 'focus:border-red-500', 'focus:ring-red-200');
+                ui.input.classList.add('border-blue-200');
+                ui.statusIcon.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+                ui.statusIcon.className = "absolute right-3 top-3.5 text-green-500";
+                ui.errorMsg.classList.add('hidden');
+                ui.invalidOverlay.classList.add('hidden');
+                ui.invalidOverlay.classList.remove('flex');
+            } else {
+                ui.input.classList.add('border-red-300', 'focus:border-red-500', 'focus:ring-red-200');
+                ui.input.classList.remove('border-blue-200');
+                ui.statusIcon.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+                ui.statusIcon.className = "absolute right-3 top-3.5 text-red-500";
+                ui.errorMsg.classList.remove('hidden');
+                ui.invalidOverlay.classList.remove('hidden');
+                ui.invalidOverlay.classList.add('flex');
+            }
+        }
+
+        // --- Export Logic ---
+        window.downloadFormat = function(type) {
+            // Check validity via overlay visibility check
+            if(!ui.invalidOverlay.classList.contains('hidden')) {
+                alert("Cannot download invalid barcode data.");
+                return;
+            }
+
+            const scale = parseInt(ui.downloadScale.value) || 1;
+
+            if (type === 'svg') {
+                const svgData = new XMLSerializer().serializeToString(ui.svg);
+                const blob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+                downloadBlob(blob, `barcode-${currentState.value}.svg`);
+            } else if (type === 'png') {
+                const canvas = document.getElementById('exportCanvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                const svgData = new XMLSerializer().serializeToString(ui.svg);
+                
+                img.onload = function() {
+                    // Get base dimensions from SVG attributes
+                    const baseW = parseInt(ui.svg.getAttribute("width"));
+                    const baseH = parseInt(ui.svg.getAttribute("height"));
+                    
+                    // Set canvas size based on scale
+                    canvas.width = baseW * scale;
+                    canvas.height = baseH * scale;
+                    
+                    // Fill background (essential for PNGs)
+                    ctx.fillStyle = currentState.background;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Draw image scaled
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    canvas.toBlob((blob) => {
+                        downloadBlob(blob, `barcode-${currentState.value}-x${scale}.png`);
+                    });
+                };
+
+                img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
+            }
+        };
+
+        function downloadBlob(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Utility
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+    </script>
+ <script async="async" data-cfasync="false" src="https://pl28699215.effectivegatecpm.com/6638ee3f7ef875c60276d1e326e6d7e3/invoke.js"></script>
+<div id="container-6638ee3f7ef875c60276d1e326e6d7e3"></div>
+</body>
+</html>
+
+

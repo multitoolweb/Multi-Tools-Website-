@@ -1,0 +1,268 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advanced Image Compressor</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background-color: #f0f8ff; /* Theme background kept */
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    h1 {
+      color: #007bff; /* Theme blue kept */
+      margin-bottom: 10px;
+    }
+
+    .container {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 123, 255, 0.1);
+      padding: 25px;
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    .upload-section {
+      border: 2px dashed #007bff;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      background: #fdfdff;
+      cursor: pointer;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    .control-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: bold;
+      color: #007bff;
+      margin-bottom: 5px;
+    }
+
+    select, input[type="range"] {
+      width: 100%;
+      accent-color: #007bff;
+    }
+
+    .stats {
+      background: #eef7ff;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-around;
+      border: 1px solid #cce5ff;
+    }
+
+    .preview-box {
+      position: relative;
+      margin-top: 15px;
+      border: 1px solid #eee;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fafafa;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    button {
+      flex: 1;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    button.secondary {
+      background-color: #6c757d;
+    }
+
+    @media (max-width: 600px) {
+      .settings-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Image Compressor Pro</h1>
+  
+  <div class="container">
+    <div class="upload-section">
+      <input type="file" id="upload" accept="image/*" />
+    </div>
+
+    <div id="editorUI" style="display:none;">
+      <div class="stats">
+        <div><strong>Original:</strong> <span id="origSize">0 KB</span></div>
+        <div><strong>New Est:</strong> <span id="newSize">0 KB</span></div>
+      </div>
+
+      <div class="settings-grid">
+        <div class="control-item">
+          <label>Compression Quality</label>
+          <select id="quality">
+            <option value="0.9">High Quality (Large)</option>
+            <option value="0.7" selected>Balanced (Medium)</option>
+            <option value="0.4">Small File (Low)</option>
+            <option value="0.1">Super Compressed</option>
+          </select>
+        </div>
+
+        <div class="control-item">
+          <label>Scale Resize (%)</label>
+          <input type="range" id="scale" min="10" max="100" value="80" />
+          <div id="scaleVal" style="font-size:10px; text-align:right">80%</div>
+        </div>
+
+        <div class="control-item">
+          <label>Brightness</label>
+          <input type="range" id="brightness" min="50" max="150" value="100" />
+        </div>
+
+        <div class="control-item">
+          <label>Contrast</label>
+          <input type="range" id="contrast" min="50" max="150" value="100" />
+        </div>
+      </div>
+
+      <div class="preview-box">
+        <img id="preview" src="" alt="Preview" />
+      </div>
+
+      <div class="action-buttons">
+        <button id="compressBtn">Compress & Download</button>
+        <button class="secondary" onclick="location.reload()">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const upload = document.getElementById('upload');
+    const preview = document.getElementById('preview');
+    const compressBtn = document.getElementById('compressBtn');
+    const editorUI = document.getElementById('editorUI');
+    
+    const qualityInput = document.getElementById('quality');
+    const scaleInput = document.getElementById('scale');
+    const scaleVal = document.getElementById('scaleVal');
+    const brightnessInput = document.getElementById('brightness');
+    const contrastInput = document.getElementById('contrast');
+    
+    const origSizeText = document.getElementById('origSize');
+    const newSizeText = document.getElementById('newSize');
+
+    let originalImg = new Image();
+    let originalFileSize = 0;
+
+    upload.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        originalFileSize = file.size;
+        origSizeText.innerText = (file.size / 1024).toFixed(2) + " KB";
+        
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          preview.src = event.target.result;
+          originalImg.src = event.target.result;
+          editorUI.style.display = 'block';
+          updateEstimate();
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Update scale label and estimate
+    [scaleInput, qualityInput, brightnessInput, contrastInput].forEach(el => {
+      el.addEventListener('input', () => {
+        scaleVal.innerText = scaleInput.value + "%";
+        applyFilters();
+        updateEstimate();
+      });
+    });
+
+    function applyFilters() {
+      preview.style.filter = `brightness(${brightnessInput.value}%) contrast(${contrastInput.value}%)`;
+    }
+
+    function updateEstimate() {
+      // Very rough estimation formula
+      const q = parseFloat(qualityInput.value);
+      const s = parseInt(scaleInput.value) / 100;
+      const est = (originalFileSize * q * (s * s)) / 1024;
+      newSizeText.innerText = "~" + est.toFixed(2) + " KB";
+    }
+
+    compressBtn.addEventListener('click', () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      const scale = parseInt(scaleInput.value) / 100;
+      canvas.width = originalImg.width * scale;
+      canvas.height = originalImg.height * scale;
+
+      // Apply filters to canvas context
+      ctx.filter = `brightness(${brightnessInput.value}%) contrast(${contrastInput.value}%)`;
+      ctx.drawImage(originalImg, 0, 0, canvas.width, canvas.height);
+
+      const quality = parseFloat(qualityInput.value);
+      
+      canvas.toBlob((blob) => {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `compressed_${Date.now()}.jpg`;
+        link.click();
+      }, 'image/jpeg', quality);
+    });
+  </script>
+</body>
+</html>
+

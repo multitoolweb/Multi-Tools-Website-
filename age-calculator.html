@@ -1,0 +1,334 @@
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Pro Age Calculator</title>
+  <style>
+    :root {
+      --primary: #007bff;
+      --secondary: #6c757d;
+      --success: #28a745;
+      --bg: #f0f4f8;
+      --card: #ffffff;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      background: var(--card);
+      padding: 35px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 123, 255, 0.1);
+      text-align: center;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    h1 {
+      color: var(--primary);
+      margin-bottom: 5px;
+      font-size: 2rem;
+    }
+
+    p.subtitle {
+      color: var(--secondary);
+      margin-bottom: 25px;
+      font-size: 0.9rem;
+    }
+
+    .manual-input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+
+    .input-wrapper {
+      flex: 1;
+      text-align: left;
+    }
+
+    .input-wrapper label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: var(--secondary);
+      margin-bottom: 5px;
+      padding-left: 5px;
+    }
+
+    input[type="number"] {
+      padding: 12px;
+      width: 100%;
+      font-size: 1.1rem;
+      border: 2px solid #e1e8ed;
+      border-radius: 12px;
+      box-sizing: border-box;
+      outline: none;
+      transition: border-color 0.3s;
+      -moz-appearance: textfield;
+    }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    input[type="number"]:focus {
+      border-color: var(--primary);
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      background-color: var(--primary);
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.3s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+      transform: translateY(-2px);
+    }
+
+    .dashboard {
+      margin-top: 30px;
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .main-age {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      padding: 15px;
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 12px;
+    }
+
+    .stat-card .label {
+      font-size: 0.8rem;
+      color: #777;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .stat-card .value {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin-top: 5px;
+    }
+
+    .birthday-alert {
+      background: #e7f3ff;
+      color: #0056b3;
+      padding: 15px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      margin-top: 20px;
+    }
+
+    #countdown {
+      font-weight: bold;
+      display: block;
+      margin-top: 5px;
+      font-size: 1.1rem;
+    }
+
+    .zodiac-tag {
+      display: inline-block;
+      padding: 5px 15px;
+      background: #333;
+      color: white;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 600px) {
+      .container { padding: 25px; }
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Age Insight</h1>
+    <p class="subtitle">Enter your birth date manually</p>
+    
+    <div class="manual-input-group">
+      <div class="input-wrapper">
+        <label>Day</label>
+        <input type="number" id="day" placeholder="DD" min="1" max="31" />
+      </div>
+      <div class="input-wrapper">
+        <label>Month</label>
+        <input type="number" id="month" placeholder="MM" min="1" max="12" />
+      </div>
+      <div class="input-wrapper">
+        <label>Year</label>
+        <input type="number" id="year" placeholder="YYYY" min="1900" max="2100" />
+      </div>
+    </div>
+    
+    <button onclick="calculateEverything()">Analyze My Life</button>
+
+    <div id="dashboard" class="dashboard">
+      <div class="main-age" id="primaryResult"></div>
+      <div id="zodiac" class="zodiac-tag"></div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="label">Total Months</div>
+          <div class="value" id="statMonths"></div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Total Weeks</div>
+          <div class="value" id="statWeeks"></div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Total Days</div>
+          <div class="value" id="statDays"></div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Total Hours</div>
+          <div class="value" id="statHours"></div>
+        </div>
+      </div>
+
+      <div class="birthday-alert">
+        🎉 Next Birthday in:
+        <span id="countdown">--:--:--:--</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let timerInterval;
+
+    function getZodiac(day, month) {
+      const signs = ["Capricorn", "Aquarius", "Pisces", "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius"];
+      const lastDays = [19, 18, 20, 19, 20, 20, 22, 22, 22, 22, 21, 21];
+      return (day > lastDays[month]) ? signs[(month + 1) % 12] : signs[month];
+    }
+
+    function calculateEverything() {
+      const day = parseInt(document.getElementById("day").value);
+      const month = parseInt(document.getElementById("month").value);
+      const year = parseInt(document.getElementById("year").value);
+
+      if (!day || !month || !year) return alert("Please fill in Day, Month, and Year.");
+      
+      // Validate date
+      const birthDate = new Date(year, month - 1, day);
+      if (birthDate.getFullYear() !== year || birthDate.getMonth() !== month - 1 || birthDate.getDate() !== day) {
+        return alert("Please enter a valid date.");
+      }
+
+      const today = new Date();
+      if (birthDate > today) return alert("Date of birth cannot be in the future.");
+
+      document.getElementById("dashboard").style.display = "block";
+
+      // Precise Age Calculation
+      let y = today.getFullYear() - birthDate.getFullYear();
+      let m = today.getMonth() - birthDate.getMonth();
+      let d = today.getDate() - birthDate.getDate();
+
+      if (d < 0) {
+        m--;
+        d += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+      }
+      if (m < 0) {
+        y--;
+        m += 12;
+      }
+
+      document.getElementById("primaryResult").innerHTML = 
+        `${y} <span style="font-size:1rem; font-weight:normal">Years</span> ` + 
+        `${m} <span style="font-size:1rem; font-weight:normal">Months</span> ` + 
+        `${d} <span style="font-size:1rem; font-weight:normal">Days</span>`;
+
+      // Stats Calculation
+      const diffMs = today - birthDate;
+      const totalDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      
+      document.getElementById("statMonths").innerText = (y * 12 + m).toLocaleString();
+      document.getElementById("statWeeks").innerText = Math.floor(totalDays / 7).toLocaleString();
+      document.getElementById("statDays").innerText = totalDays.toLocaleString();
+      document.getElementById("statHours").innerText = Math.floor(diffMs / (1000 * 60 * 60)).toLocaleString();
+
+      // Zodiac (Month index is 0-based in getZodiac logic)
+      document.getElementById("zodiac").innerText = "Zodiac: " + getZodiac(day, month - 1);
+
+      // Countdown to Next Birthday
+      if (timerInterval) clearInterval(timerInterval);
+      
+      const updateCountdown = () => {
+        const now = new Date();
+        let nextBday = new Date(now.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+        
+        if (now > nextBday) {
+          nextBday.setFullYear(now.getFullYear() + 1);
+        }
+
+        const t = nextBday - now;
+        const days = Math.floor(t / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((t % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const mins = Math.floor((t % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((t % (1000 * 60)) / 1000);
+
+        document.getElementById("countdown").innerText = `${days}d ${hours}h ${mins}m ${secs}s`;
+      };
+
+      updateCountdown();
+      timerInterval = setInterval(updateCountdown, 1000);
+    }
+
+    // Auto-focus logic for better UX
+    document.getElementById('day').addEventListener('input', function() {
+      if (this.value.length === 2) document.getElementById('month').focus();
+    });
+    document.getElementById('month').addEventListener('input', function() {
+      if (this.value.length === 2) document.getElementById('year').focus();
+    });
+  </script>
+  <script async="async" data-cfasync="false" src="https://pl28699215.effectivegatecpm.com/6638ee3f7ef875c60276d1e326e6d7e3/invoke.js"></script>
+<div id="container-6638ee3f7ef875c60276d1e326e6d7e3"></div>
+
+</body>
+</html>
